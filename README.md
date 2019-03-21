@@ -1,4 +1,4 @@
-# automation-center-sdk-samples
+# Deep Security Automation Center SDK Samples
 
 This repository contains sample code for the Trend Micro Deep Security SDK. The examples in the [Automation Center](https://automation.deepsecurity.trendmicro.com) guides are based on these samples. Samples for each programming language are located in the python, javascript, and java folders. 
 
@@ -11,6 +11,8 @@ This repository contains sample code for the Trend Micro Deep Security SDK. The 
   * [Run the Python samples](#run-the-python-samples)
   * [Run the JavaScript samples](#run-the-javascript-samples)
   * [Run the Java samples](#run-the-java-samples)
+* [Support](#support)
+* [Contribute](#contribute)
 
 ## Branches
 
@@ -113,3 +115,24 @@ Install the SDK and required software for the language that you are interested i
 1. Open the `src/com.trendmicro/deepsecurity/docs/RunExamples.java` file. The file contains code that runs policy-related examples. To run other examples, add similar code.
 1. Change the values of the global variables according to your Deep Security Manager instance, such as the `computerID` variable.
 1. Click **Run > Run As > Java Application**.
+
+## Support
+
+This is an Open Source community project. Project contributors may be able to help, depending on their time and availability. Please be specific about what you're trying to do, your system, and steps to reproduce the problem.
+
+For bug reports or feature requests, please open an [issue](https://github.com/deep-security/automation-center-sdk-samples/issues). You are welcome to contribute.
+
+Official support from Trend Micro is not available. Individual contributors may be Trend Micro employees, but are not official support.
+
+If you have questions about using the SDK, consider asking on [Stack Overflow](https://stackoverflow.com/questions/tagged/deepsecurity). Tag your question with `deepsecurity` and it will get pushed to our internal automation support Slack channel.
+
+## Contribute
+
+We accept contributions from the community. To submit changes:
+
+1. Fork this repository.
+1. Create a new feature branch.
+1. Make your changes.
+1. Submit a pull request with an explanation of your changes or additions.
+
+We will review and work with you to release the code.
