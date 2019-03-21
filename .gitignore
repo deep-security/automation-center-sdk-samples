@@ -69,3 +69,4 @@ __pycache__/
 properties.json
 patches/
 package-lock.json
+example.properties
