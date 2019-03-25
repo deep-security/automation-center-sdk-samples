@@ -50,7 +50,7 @@ Install the SDK and required software for the language that you are interested i
 
 * [Python](https://automation.deepsecurity.trendmicro.com/article/python)
 * [JavaScript](https://automation.deepsecurity.trendmicro.com/article/javascript3)
-* [Java](https://automation.deepsecurity.trendmicro.com/article/java) -- Note that if you are importing the provided Eclipse project, you add the SDK to your project's build path after you import the project. See the [Run the Java samples](#run-the-java-samples) section.
+* [Java](https://automation.deepsecurity.trendmicro.com/article/java) -- Note that if you are importing the Eclipse project that we provide in this repository, you add the SDK to your project's build path after you import the project. See the [Run the Java samples](#run-the-java-samples) section.
 
 ### Run the Python samples
 
@@ -92,6 +92,8 @@ Install the SDK and required software for the language that you are interested i
 1. In the command line interface, change the current directory to `./javascript/` and then enter `node App.js`.
 
 ### Run the Java samples
+
+These instruction use [Eclipse](https://www.eclipse.org/) as the IDE. However, you can use another Java IDE if you prefer.
 
 1. Open a command line or terminal and change the current directory to the `automation-center-sdk-samples` directory of your local repository.
 1. Enter the following command to create a new Git branch: 
