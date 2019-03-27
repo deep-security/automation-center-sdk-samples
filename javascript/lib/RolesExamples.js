@@ -59,7 +59,7 @@ exports.searchRolesByName = function(roleName, api, apiVersion) {
 };
 
 /*
- * Creates a role with rights that are appropriate for generating computer status reports.
+ * Creates a role with rights that are appropriate for reading computer properties and assigning policies to computers.
  * @param {object} api The api module.
  * @param {String} apiVersion The API version to use.
  * @return {Promise} A promise that contains the ID of the new role.

@@ -54,7 +54,7 @@ def search_roles_by_name(api, configuration, api_version, api_exception, role_na
 
 
 def create_role_for_computer_reports(api, configuration, api_version, api_exception):
-    """ Creates a role with rights that are appropriate for generating computer status reports.
+    """ Creates a role with rights that are appropriate for reading computer properties and assigning policies to computers.
 
     :param api: The Deep Security API modules.
     :param configuration: Configuration object to pass to the api client.
