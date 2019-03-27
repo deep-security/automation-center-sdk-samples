@@ -60,7 +60,7 @@ Install the SDK and required software for the language that you are interested i
 		
 		{
     		"url": "https://192.168.17.143:4119/api",
-    		"secretkey": "2:HNVgA9U0Gf1F/+GtKB58ITFJkoCVxysoz/vTi5NmLPk="
+    		"secretkey": "8C9AECC0-7213-5E16-8C15-C1646C128C33:PEN/DJELmA75dCVn6/vWKo4mW6dKWjJ0imW5POBObyw="
 		}
 
 	**Note:** The properties.json file is listed in the .gitignore file so it is not included in the repository. In this way, this sensitive data is not shared outside your local hard drive.
@@ -80,7 +80,7 @@ Install the SDK and required software for the language that you are interested i
 
 		{
     		"url": "https://192.168.17.143:4119/api",
-    		"secretkey": "2:HNVgA9U0Gf1F/+GtKB58ITFJkoCVxysox/vTi5NmLPk="
+    		"secretkey": "8C9AECC0-7213-5E16-8C15-C1646C128C33:PEN/DJELmA75dCVn6/vWKo4mW6dKWjJ0imW5POBObyw="
 		}
 		
 	**Note:** The properties.json file is listed in the .gitignore file so it is not included in the repository. In this way, this sensitive data is not shared outside your local hard drive.
@@ -110,7 +110,7 @@ These instruction use [Eclipse](https://www.eclipse.org/) as the IDE. However, y
 1. Below src, right-click **com/trendmicro/deepsecurity/docs/Resources** and click **New > File**. (Depending on your version of Eclipse, you might have to click **New > Other**, then select **General/File**.)
 1. Create a file named `example.properties` and add the following text into it, replacing the values for `url`  and `secretkey` with the URL and API key for your Deep Security Manager instance:
 
-		secretkey=2:HNVgA9U0Gf1F/+GtKB58ITFJkoCVxysox/vTi5NmLPk=
+		secretkey=2:8C9AECC0-7213-5E16-8C15-C1646C128C33:PEN/DJELmA75dCVn6/vWKo4mW6dKWjJ0imW5POBObyw=
 		url=https://192.168.17.143:4119
 		
 	**Note:** The example.properties file is listed in the .gitignore file so it is not included in the repository. In this way, this sensitive data is not shared outside your local hard drive.
