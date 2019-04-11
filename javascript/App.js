@@ -165,6 +165,15 @@ AutomateDeploymentExamples.addComputer("testcomputer", api, apiVersion)
   })
   .catch(error => {
     console.log(`Error adding computer: ${error}`);
+  }); 
+
+const platform = api.AgentDeploymentScript.PlatformEnum.linux;
+AutomateDeploymentExamples.getAgentDeploymentScript(api, apiVersion, platform, null, false, true)
+  .then(script => {
+    console.log(script);
+  })
+  .catch(error => {
+    console.log(error);
   });
 */
 /*
