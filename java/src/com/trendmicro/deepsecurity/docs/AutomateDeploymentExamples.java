@@ -17,8 +17,11 @@
 package com.trendmicro.deepsecurity.docs;
 
 import com.trendmicro.deepsecurity.ApiException;
+import com.trendmicro.deepsecurity.api.AgentDeploymentScriptsApi;
 import com.trendmicro.deepsecurity.api.ComputersApi;
 import com.trendmicro.deepsecurity.api.SystemSettingsApi;
+import com.trendmicro.deepsecurity.model.AgentDeploymentScript;
+import com.trendmicro.deepsecurity.model.AgentDeploymentScript.PlatformEnum;
 import com.trendmicro.deepsecurity.model.Computer;
 import com.trendmicro.deepsecurity.model.SettingValue;
 import com.trendmicro.deepsecurity.model.SystemSettings;
@@ -70,5 +73,41 @@ public class AutomateDeploymentExamples {
 		computer = computersApi.createComputer(computer, Boolean.FALSE, apiVersion);
 
 		return computer.getID();
+	}
+	
+	/**
+	 * Obtains an agent deployment script from Deep Security Manager according to the provided parameter values.
+	 * 
+	 * @param platform A PlatformEnum that indicates the platform of the target computer.
+	 * @param dsmProxyID The Integer ID of the proxy to use to connect to Deep Security Manager. Set to null for no proxy. 
+	 * @param validateCertificate A Boolean value of true causes the script to validate that Deep Security Manager is using a valid TLS certificate from a trusted certificate authority (CA) when downloading the agent installer. When null, the default of false is used. 
+	 * @param activate A Boolean value of true causes the script to activate the agent. When null, the default of false is used;
+	 * @param computerGroupID The Integer ID of the computer group to which the computer is added. Set to null for no computer group. 
+	 * @param policyID The Integer ID of the policy to assign to the computer. Set to null to assign no policy. 
+	 * @param relayID The Integer ID of the relay to assign to the computer for obtaining updates. Set to null to assign no relay. 
+	 * @param relayProxyID The Integer ID of the proxy that the agent uses to connect to the relay. Set to null for no proxy. 
+	 * @param apiVersion A String that identifies the version of the API to use, such as "v1".
+	 * @return A String that contains the deployment script.
+	 * @throws ApiException if a problem occurs when generating the script on Deep Security Manager. 
+	 */
+	public static String getAgentDeploymentScript(PlatformEnum platform, Integer dsmProxyID, Boolean validateCertificate, Boolean activate, Integer computerGroupID, Integer policyID, Integer relayID, Integer relayProxyID, String apiVersion) throws ApiException {
+		
+		// Create the AgentDeplotmentScript object
+		AgentDeploymentScript deployScript = new AgentDeploymentScript();
+		deployScript.setPlatform(platform);
+		deployScript.setDsmProxyID(dsmProxyID);
+		deployScript.setValidateCertificateRequired(validateCertificate);
+		deployScript.setActivationRequired(activate);
+		deployScript.setComputerGroupID(computerGroupID);
+		deployScript.setPolicyID(policyID);
+		deployScript.setRelayGroupID(relayID);
+		deployScript.setRelayProxyID(relayProxyID);
+		
+		// Get the script from Deep Security Manager
+		AgentDeploymentScriptsApi agentDeploymentScriptsApi = new AgentDeploymentScriptsApi();
+		deployScript = agentDeploymentScriptsApi.generateAgentDeploymentScript(deployScript, apiVersion);
+		
+		// Return the script
+		return deployScript.getScriptBody();
 	}
 }

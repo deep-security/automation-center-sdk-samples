@@ -147,6 +147,7 @@ role_name = "Auditor"
 host_name = "testhostname"
 
 def main():
+    
     # Role examples
     print(
         "Displaying results from role_examples.search_roles_by_name:\n" +
@@ -236,6 +237,13 @@ def main():
         str(automate_deployment_examples.add_computer(
             api, configuration, api_version, api_exception, host_name
         ))
+    )
+
+    print(
+        "Displaying results from automate_deployment_examples.get_agent_deployment_script:\n" +
+        automate_deployment_examples.get_agent_deployment_script(
+            api, configuration, api_version, api_exception, "linux"
+        )
     )
 
     # Policy examples

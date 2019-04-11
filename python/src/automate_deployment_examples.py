@@ -64,3 +64,42 @@ def add_computer (api, configuration, api_version, api_exception, hostname):
 
     except api_exception as e:
         return "Exception: " + str(e)
+
+def get_agent_deployment_script (api, configuration, api_version, api_exception, platform, dsm_proxy_id = None, validate_certificate = None, activate = None, computer_group_id = None, policy_id = None, relay_id = None, relay_proxy_id = None):
+    """ Obtains an agent deployment script from Deep Security Manager according to the provided parameter values
+
+    :param api: The Deep Security API modules.
+    :param configuration: Configuration object to pass to the api client.
+    :param api_version: The version of the API to use.
+    :param api_exception: The Deep Security API exception module.
+    :param platform: The platform of the target computer. Valid values are linux, solaris, and windows.
+    :param dsm_proxy_id: The ID of the proxy to use to connect to Deep Security Manager. Default is to use no proxy.
+    :param validate_certificate: True indicates to validate that Deep Security Manager is using a valid TLS certificate from a trusted certificate authority (CA) when downloading the agent installer. Default is False.
+    :param activate: True causes the script to activate the agent. Default is False.
+    :param computer_group_id: The ID of the computer group to which the computer is added. Default is no group.
+    :param policy_id: The ID of the policy to assign to the computer. Default is to assign no policy.
+    :param relay_id: The ID of the relay to assign to the computer for obtaining updates. Default is no relay.
+    :param relay_proxy_id: The ID of the proxy that the agent uses to connect to the relay. Default is to use no proxy.
+    :return: A String that contains the deployment script.
+    """
+
+    # Create the AgentDeploymentScript object and configure
+    deployment_script = api.AgentDeploymentScript()
+    deployment_script.platform = platform
+    deployment_script.dsm_proxy_id = dsm_proxy_id
+    deployment_script.validate_certificate_required = validate_certificate
+    deployment_script.activation_required = activate
+    deployment_script.computer_group_id = computer_group_id
+    deployment_script.policy_id = policy_id
+    deployment_script.relay_id = relay_id
+    deployment_script.replay_proxy_id = relay_proxy_id
+
+    try:
+        deployment_scripts_api = api.AgentDeploymentScriptsApi(api.ApiClient(configuration))
+        deployment_script = deployment_scripts_api.generate_agent_deployment_script(api_version, agent_deployment_script = deployment_script)
+        return deployment_script.script_body
+
+    except api_exception as e:
+        return "Exception: " + str(e)
+
+
