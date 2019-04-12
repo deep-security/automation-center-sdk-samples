@@ -40,7 +40,7 @@ DefaultAuthentication.apiKey = properties.secretkey;
 //Environment values -- change as needed
 let auditorRoleId = 2;
 let computerID = 801;
-let policyID = 1001;
+let policyID = 1;
 let realTimeScanConfigID = 1;
 let directoryListID = 1;
 
@@ -71,6 +71,20 @@ FirstStepsPostExample.searchFirewallRules(properties.url, properties.secretkey)
     console.log(`Error searching for Firewall rules: ${error}`);
   });
 
+/*
+// ### API Rate Limit examples ###
+const RateLimitExamples = require("./lib/RateLimitExamples.js");
+
+// IDs of computers to modify; computerIDs.length > an API rate limit -- edit for your environment
+const computerIDs = [31, 32, 33, 34, 35];
+RateLimitExamples.setComputerPolicyAndCheckRateLimits(computerIDs, policyID, api, apiVersion)
+  .then(modifiedComputerIDs => {
+    console.log(`Modified computers: ${modifiedComputerIDs}`);
+  })
+  .catch(error => {
+    console.log(error);
+  });
+*/
 /*
 // ### Roles examples ###
 const RoleExamples = require("./lib/RolesExamples.js");
@@ -165,7 +179,7 @@ AutomateDeploymentExamples.addComputer("testcomputer", api, apiVersion)
   })
   .catch(error => {
     console.log(`Error adding computer: ${error}`);
-  }); 
+  });
 
 const platform = api.AgentDeploymentScript.PlatformEnum.linux;
 AutomateDeploymentExamples.getAgentDeploymentScript(api, apiVersion, platform, null, false, true)
@@ -298,7 +312,7 @@ LogInspectionExample.configureLogInspection(api, policyID, liRules, apiVersion)
     console.log(`Error setting Log Inspection state: ${error}`);
   });
 
-// Log Inspection rule details 
+// Log Inspection rule details
 var params = {
   name: "Inspect log for error",
   namexml: "Inspect log for error xml",

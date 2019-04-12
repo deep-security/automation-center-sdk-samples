@@ -35,11 +35,9 @@ import com.trendmicro.deepsecurity.model.Computer;
  */
 public class RunExamples {
 
-	// Values to use for example method arguments. Edit according to your
-	// environment.
+	// Values to use for example method arguments. Edit according to your environment.
 	private static String	apiVersion	= "v1";
-	private static String	policyName	= "Test Policy " + ThreadLocalRandom.current().nextInt(1, 1000);	// Suffix avoids
-																										// collisions
+	private static String	policyName	= "Test Policy " + ThreadLocalRandom.current().nextInt(1, 1000);	// Suffix avoids collisions
 	private static Integer	computerID	= new Integer(801);
 
 	public static void main(String[] args) {
