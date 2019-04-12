@@ -60,9 +60,11 @@ import settings_examples
 import computer_override_examples
 import scheduled_task_examples
 import role_examples
+import rate_limit_examples
 
 # Values for use in examples
 
+# policy_id for Rate Limit example
 # policy_id for Application Control example
 # policy_id for Integrity Monitoring example
 # policy_id for Intrusion Prevention examples
@@ -71,7 +73,10 @@ import role_examples
 # policy_id for Anti-malware example
 # policy_id for Firewall example
 # policy_id for Search Examples
-policy_id = 10
+policy_id = 1
+
+# computer_ids for Rate Limit example
+computer_ids = [31, 32, 33, 34, 35]
 
 # computer_id & policy_name for Policy examples
 computer_id = 1
@@ -147,7 +152,14 @@ role_name = "Auditor"
 host_name = "testhostname"
 
 def main():
-    
+
+    # Rate Limit example
+    print(
+        "Displaying result from role_limit_examples.set_computer_policy_check_rate_limit\n" +
+        str(rate_limit_examples.set_computer_policy_check_rate_limit(
+            api, configuration, api_version, api_exception, computer_ids, policy_id))
+    )
+
     # Role examples
     print(
         "Displaying results from role_examples.search_roles_by_name:\n" +
