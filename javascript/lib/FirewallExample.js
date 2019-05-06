@@ -14,39 +14,43 @@
  * limitations under the License.
  */
 
-/*
- * Modifies a policy to set the firewall state to ON and disables reconnassaince scan.
+/**
+ * Modifies a policy to set the firewall state to ON, assign rules, and enable reconnassaince scan.
  * @param {ApiClient} api The Deep Security API exports.
+ * @param {Array.<Number>} ruleIDs The IDs of the Firewall rules to assign.
  * @param {String} policyID The ID of the policy to modify.
  * @param {String} apiVersion The API version to use.
  * @returns {Promise} A promise object that resolves to the ID of the modified policy.
  */
-exports.modifyFirewallPolicy = function(api, policyID, apiVersion) {
+exports.modifyFirewallPolicy = function(api, ruleIDs, policyID, apiVersion) {
   return new Promise((resolve, reject) => {
     const policy = new api.Policy();
     const policiesApi = new api.PoliciesApi();
     const firewallPolicyExtension = new api.FirewallPolicyExtension();
 
-    //Turn on firewall
+    // Turn on firewall
     firewallPolicyExtension.state = api.FirewallPolicyExtension.StateEnum.on;
 
-    //Add to the policy
+    // Assign rules
+    firewallPolicyExtension.ruleIDs = ruleIDs;
+
+    // Add to the policy
     policy.firewall = firewallPolicyExtension;
 
-    //Turn off reconnaisance scan
+    // Turn on reconnaisance scan
     const policySettings = new api.PolicySettings();
     const settingValue = new api.SettingValue();
-    settingValue.value = "false";
+    settingValue.value = "true";
     policySettings.firewallSettingReconnaissanceEnabled = settingValue;
 
-    //Add to the policy
+    // Add to the policy
     policy.policySettings = policySettings;
 
-    //Send the change to Deep Security Manager
+    // Send the change to Deep Security Manager
     policiesApi
       .modifyPolicy(policyID, policy, apiVersion, { overrides: false })
       .then(modifiedPolicy => {
-        resolve(modifiedPolicy);
+        resolve(modifiedPolicy.ID);
       })
       .catch(error => {
         reject(error);

@@ -14,7 +14,7 @@
 #
 
 def configure_integrity_monitoring(api, configuration, api_version, api_exception, policy_id, im_rule_ids):
-    """ Adds integrity monitoring rules to a policy.
+    """ Turns on Integrity Monitoring and adds integrity monitoring rules for a policy.
 
     :param api: The Deep Security API modules.
     :param configuration: Configuration object to pass to the api client.
@@ -22,21 +22,24 @@ def configure_integrity_monitoring(api, configuration, api_version, api_exceptio
     :param api_exception: The Deep Security API exception module.
     :param policy_id: The ID of the policy to modify.
     :param im_rule_ids: A list of integrity monitoring rule IDs.
-    :return: A PoliciesApi object containing a policy containing the added integrity monitoring rules.
+    :return: The ID of the modified policy.
     """
 
-    # Get the rule ID
+    # Turn on Integrity Monitoring
     policy_config_integrity_monitoring = api.IntegrityMonitoringPolicyExtension()
+    policy_config_integrity_monitoring.state = "on"
+
+    # Add the rule IDs
     policy_config_integrity_monitoring.rule_ids = im_rule_ids
 
-    # Add the rule IDs a policy
+    # Add to a policy
     policy = api.Policy()
     policy.integrity_monitoring = policy_config_integrity_monitoring
 
     try:
         # Modify the policy on Deep Security Manager
         policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        return policies_api.modify_policy(policy_id, policy, api_version)
-
+        modified_policy = policies_api.modify_policy(policy_id, policy, api_version)
+        return modified_policy.id
     except api_exception as e:
         return "Exception: " + str(e)

@@ -26,6 +26,8 @@ import com.trendmicro.deepsecurity.api.PoliciesApi;
 import com.trendmicro.deepsecurity.model.Computer;
 import com.trendmicro.deepsecurity.model.Computers;
 import com.trendmicro.deepsecurity.model.IntrusionPreventionComputerExtension;
+import com.trendmicro.deepsecurity.model.IntrusionPreventionPolicyExtension;
+import com.trendmicro.deepsecurity.model.IntrusionPreventionPolicyExtension.StateEnum;
 import com.trendmicro.deepsecurity.model.Policy;
 import com.trendmicro.deepsecurity.model.PolicySettings;
 import com.trendmicro.deepsecurity.model.SettingValue;
@@ -35,29 +37,41 @@ import com.trendmicro.deepsecurity.model.SettingValue;
  */
 public class IntrusionPreventionExamples {
 	/**
-	 * Turns on the automatic application of recommendation scans for Intrusion Prevention in a policy.
+	 * Runs Intrusion Prevention in prevent mode and turns on the automatic application of recommendation scans for a policy.
 	 * 
 	 * @param policyId The ID of the policy to modify.
+	 * @param ruleIDs The IDs of the Intrusion Prevention rules to assign.
 	 * @param apiVersion The version of the API to use.
 	 * @throws ApiException if a problem occurs when modifying the policy on Deep Security Manager.
-	 * @return The modified policy.
+	 * @return The ID of the modified policy.
 	 */
-	public static Policy modifyIntrusionPreventionPolicy(Integer policyId, String apiVersion) throws ApiException {
+	public static Integer modifyIntrusionPreventionPolicy(Integer policyId, List<Integer> ruleIDs, String apiVersion) throws ApiException {
 
-		// Create a setting object and turn on automatic application of recommendation
-		// scans
+		// Run in prevent mode
+		IntrusionPreventionPolicyExtension ipPolicyExtension = new IntrusionPreventionPolicyExtension();
+		ipPolicyExtension.setState(StateEnum.PREVENT);
+		
+		// Assign rules
+		ipPolicyExtension.setRuleIDs(ruleIDs);
+		
+		// Add to a policy
+		Policy policy = new Policy();
+		policy.setIntrusionPrevention(ipPolicyExtension);
+		
+		// Create a setting object and turn on automatic application of recommendation scans
 		PolicySettings policySettings = new PolicySettings();
 		SettingValue settingValue = new SettingValue();
 		settingValue.setValue("Yes");
 		policySettings.setIntrusionPreventionSettingAutoApplyRecommendationsEnabled(settingValue);
 
 		// Add to a policy
-		Policy policy = new Policy();
 		policy.setPolicySettings(policySettings);
 
 		// Update the policy on Deep Security Manager
 		PoliciesApi policiesApi = new PoliciesApi();
-		return policiesApi.modifyPolicy(policyId, policy, Boolean.FALSE, apiVersion);
+		Policy modifiedPolicy = policiesApi.modifyPolicy(policyId, policy, Boolean.FALSE, apiVersion);
+		
+		return modifiedPolicy.getID();
 	}
 
 	/**

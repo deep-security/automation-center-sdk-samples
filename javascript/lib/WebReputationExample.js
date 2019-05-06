@@ -20,7 +20,7 @@
  * @param {Number} policyId The ID of the policy to modify.
  * @param {Number} securityLevel The security level to set for web reputation.
  * @param {String} apiVersion The version of the api to use.
- * @return {Promise} A promise that contains the modified policy
+ * @return {Promise} A promise that contains the ID of the modified policy
  */
 exports.configureWebReputation = function(api, policyID, securityLevel, apiVersion) {
   return new Promise((resolve, reject) => {
@@ -54,7 +54,7 @@ exports.configureWebReputation = function(api, policyID, securityLevel, apiVersi
 
     modify()
       .then(modifiedPolicy => {
-        resolve(modifiedPolicy);
+        resolve(modifiedPolicy.ID);
       })
       .catch(error => {
         reject(error);

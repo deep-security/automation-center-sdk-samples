@@ -29,7 +29,7 @@ with open(property_file) as raw_properties:
     properties = json.load(raw_properties)
 
 secret_key = properties['secretkey']
-url =  properties['url']
+url = properties['url']
 
 
 # Add DSM host information to the API client configuration
@@ -88,7 +88,7 @@ reset_li_rule_id = 20
 im_rule_ids = [1, 2]
 
 # li_rules for Log Inspection Examples
-li_rules = [54, 55, 56]
+li_rules = [21, 25, 31]
 
 # security_level for Web Reputation examples
 security_level = "High"
@@ -97,10 +97,16 @@ security_level = "High"
 real_time_scan_config_id = 1
 real_time_scan_schedule_id = 4
 
+# ip_rule_ids for Intrusion Prevention examples
+ip_rule_ids = [1, 2, 3, 4]
+
 # key_id & role_id & key_name for API Key examples
 key_id = 4
 role_id = 1
 key_name = "auditor_key"
+
+# rule_ids for Firewall examples
+rule_ids = [1, 2, 3, 4]
 
 # num_days & relay_list_id & name for Search Examples
 num_days = 40
@@ -150,6 +156,7 @@ role_name = "Auditor"
 
 # For Automate Deployment examples
 host_name = "testhostname"
+
 
 def main():
 
@@ -288,7 +295,7 @@ def main():
     print(
         "Displaying results from intrusion_prevention_examples.modify_intrusion_prevention_policy:\n" +
         str(intrusion_prevention_examples.modify_intrusion_prevention_policy(
-            api, configuration, api_version, api_exception, policy_id))
+            api, configuration, api_version, api_exception, policy_id, ip_rule_ids))
     )
 
     print(
@@ -341,7 +348,7 @@ def main():
     print(
         "Displaying results from firewall_examples.modify_firewall_policy:\n" +
         str(firewall_examples.modify_firewall_policy(
-            api, configuration, api_version, api_exception, policy_id))
+            api, configuration, api_version, api_exception, rule_ids, policy_id))
     )
 
     # First Steps Post example
@@ -399,7 +406,7 @@ def main():
         "Displaying results from computer_status_examples.apply_rule_to_policies:\n" +
         str(computer_status_examples.apply_rule_to_policies(
             api, configuration, api_version, api_exception, computer_status_examples.check_computers_for_ip_rule(
-            api, configuration, api_version, api_exception, rule_id), rule_id_2))
+                api, configuration, api_version, api_exception, rule_id), rule_id_2))
     )
 
     print(
@@ -412,13 +419,13 @@ def main():
     print(
         "Displaying results from computer_status_examples.get_computer_statuses:\n" +
         str(computer_status_examples.get_computer_statuses(
-        api, configuration, api_version, api_exception))
+            api, configuration, api_version, api_exception))
     )
 
     print(
         "Displaying results from computer_status_examples.get_anti_malware_status_for_computers:\n" +
         str(computer_status_examples.get_anti_malware_status_for_computers(
-        api, configuration, api_version, api_exception))
+            api, configuration, api_version, api_exception))
     )
 
     # Common Objects examples
@@ -489,6 +496,7 @@ def main():
         str(first_steps_get_examples.get_policies_list(
             api, configuration, api_version, api_exception))
     )
+
 
 if __name__ == '__main__':
     main()

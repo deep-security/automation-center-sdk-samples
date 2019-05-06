@@ -37,7 +37,7 @@ public class WebReputationExamples {
 	 * @throws ApiException if a problem occurs when modifying the policy on Deep Security Manager.
 	 * @return The modified policy.
 	 */
-	public static Policy setSecurityLevel(Integer policyId, String securityLevel, String apiVersion) throws ApiException {
+	public static Integer setSecurityLevel(Integer policyId, String securityLevel, String apiVersion) throws ApiException {
 
 		// Set the state, security level, and Smart Protection Server
 		WebReputationPolicyExtension webReputationPolicyExtension = new WebReputationPolicyExtension();
@@ -61,6 +61,7 @@ public class WebReputationExamples {
 
 		// Send the policy to Deep Security Manager
 		PoliciesApi policiesApi = new PoliciesApi();
-		return policiesApi.modifyPolicy(policyId, policy, Boolean.FALSE, apiVersion);
+		Policy modifiedPolicy = policiesApi.modifyPolicy(policyId, policy, Boolean.FALSE, apiVersion);
+		return modifiedPolicy.getID();
 	}
 }
