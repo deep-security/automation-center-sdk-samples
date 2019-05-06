@@ -20,25 +20,30 @@
  * @param {Number} policyId The ID of the policy to modify.
  * @param {Number} liRules An array of Log Inspection rule IDs to add.
  * @param {String} apiVersion The version of the api to use.
- * @returns {Promise} A promise that contains the modified policy.
+ * @returns {Promise} A promise that contains the ID of the modified policy.
  */
 exports.configureLogInspection = function(api, policyID, liRules, apiVersion) {
   return new Promise((resolve, reject) => {
+    // Turn on Log Inspection
     const logInspectionPolicyExtension = new api.LogInspectionPolicyExtension();
+    logInspectionPolicyExtension.state = api.LogInspectionPolicyExtension.StateEnum.on;
+
+    // Add the rule
     logInspectionPolicyExtension.ruleIDs = liRules;
-    //Add to a policy
+
+    // Add to a policy
     const policy = new api.Policy();
     policy.logInspection = logInspectionPolicyExtension;
 
-    //Modifies the policy on Deep Security Manager
+    // Modifies the policy on Deep Security Manager
     const modify = () => {
       const policiesApi = new api.PoliciesApi();
       return policiesApi.modifyPolicy(policyID, policy, apiVersion, { overrides: false });
     };
 
-    return modify()
-      .then(data => {
-        resolve(data);
+    modify()
+      .then(modifiedPolicy => {
+        resolve(modifiedPolicy.ID);
       })
       .catch(error => {
         reject(error);
