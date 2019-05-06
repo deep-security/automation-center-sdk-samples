@@ -30,7 +30,7 @@ import com.trendmicro.deepsecurity.model.SettingValue;
  */
 public class FirewallExamples {
 	/**
-	 * Modifies a policy to set the Firewall state to ON, assing rules, and enable reconnaissance scan.
+	 * Modifies a policy to set the Firewall state to ON, assign rules, and enable reconnaissance scan.
 	 * 
 	 * @param policyId The ID of the policy to modify.
 	 * @param ruleIDs A list of Firewall rule IDs to assign to the policy.
