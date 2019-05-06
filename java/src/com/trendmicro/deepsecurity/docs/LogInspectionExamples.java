@@ -20,30 +20,38 @@ import com.trendmicro.deepsecurity.ApiException;
 import com.trendmicro.deepsecurity.api.PoliciesApi;
 import com.trendmicro.deepsecurity.model.Policy;
 import com.trendmicro.deepsecurity.model.LogInspectionPolicyExtension;
+import com.trendmicro.deepsecurity.model.LogInspectionPolicyExtension.StateEnum;
 
 /**
  * Configures the Log Inspection module.
  */
 public class LogInspectionExamples {
 	/**
-	 * Adds a Log Inspection rule to a policy.
+	 * Turns on Log Inspection and adds a Log Inspection rule for a policy.
 	 * 
 	 * @param policyId The ID of the policy to modify.
 	 * @param liRule The rule ID to add.
 	 * @param apiVersion The version of the API to use.
 	 * @throws ApiException if a problem occurs when modifying the policy on Deep Security Manager.
-	 * @return The modified policy.
+	 * @return The ID of the modified policy.
 	 */
-	public static Policy addLogInspectionRule(Integer policyId, Integer liRule, String apiVersion) throws ApiException {
-
-		// Add the rule ID to a policy
+	public static Integer addLogInspectionRule(Integer policyId, Integer liRule, String apiVersion) throws ApiException {
+		
+		// Turn on Log Inspection
 		LogInspectionPolicyExtension logInspectionPolicyExtension = new LogInspectionPolicyExtension();
+		logInspectionPolicyExtension.setState(StateEnum.ON);
+
+		// Add the rule ID
 		logInspectionPolicyExtension.addRuleIDsItem(liRule);
+		
+		// Add to a policy
 		Policy policy = new Policy();
 		policy.setLogInspection(logInspectionPolicyExtension);
 
 		// Update the policy on Deep Security Manager
 		PoliciesApi policiesApi = new PoliciesApi();
-		return policiesApi.modifyPolicy(policyId, policy, Boolean.FALSE, apiVersion);
+		Policy modifiedPolicy = policiesApi.modifyPolicy(policyId, policy, Boolean.FALSE, apiVersion);
+		
+		return modifiedPolicy.getID();
 	}
 }

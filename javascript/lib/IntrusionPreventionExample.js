@@ -18,11 +18,25 @@
  * Turns on the automatic application of recommendation scans for Intrusion Prevention in a policy.
  * @param {Object} api The Deep Security API modules.
  * @param {Number} policyId The ID of the policy to modify.
+ * @param {Array.<Number>} ruleIDs The IDs of the Intrusion Prevention rules to assign.
  * @param {String} apiVersion The version of the api to use.
- * @returns {Promise} A promise that contains the modified policy.
+ * @returns {Promise} A promise that contains the ID of the modified policy.
  */
-exports.modifyIntrusionPreventionPolicy = function(api, policyID, apiVersion) {
+exports.modifyIntrusionPreventionPolicy = function(api, policyID, ruleIDs, apiVersion) {
   return new Promise((resolve, reject) => {
+    const policy = new api.Policy();
+    const policiesApi = new api.PoliciesApi();
+    const ipPolicyExtension = new api.IntrusionPreventionPolicyExtension();
+
+    // Run in prevent mode
+    ipPolicyExtension.state = api.IntrusionPreventionPolicyExtension.StateEnum.prevent;
+
+    // Assign rules
+    ipPolicyExtension.ruleIDs = ruleIDs;
+
+    // Add to the policy
+    policy.IntrusionPrevention = ipPolicyExtension;
+
     // Configure the setting
     const policySettings = new api.PolicySettings();
     const settingValue = new api.SettingValue();
@@ -30,18 +44,16 @@ exports.modifyIntrusionPreventionPolicy = function(api, policyID, apiVersion) {
     policySettings.intrusionPreventionSettingAutoApplyRecommendationsEnabled = settingValue;
 
     // Add to a policy
-    const policy = new api.Policy();
     policy.policySettings = policySettings;
 
     // Modifies the policy on Deep Security Manager
     const modify = function() {
-      const policiesApi = new api.PoliciesApi();
       return policiesApi.modifyPolicy(policyID, policy, apiVersion, { overrides: false });
     };
 
     modify()
       .then(policy => {
-        resolve(policy);
+        resolve(policy.ID);
       })
       .catch(error => {
         reject(error);

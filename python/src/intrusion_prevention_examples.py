@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 
-def modify_intrusion_prevention_policy(api, configuration, api_version, api_exception, policy_id):
+def modify_intrusion_prevention_policy(api, configuration, api_version, api_exception, policy_id, rule_ids):
     """ Turns on the automatic application of recommendation scans for intrusion prevention in a policy.
 
     :param api: The Deep Security API modules.
@@ -21,8 +21,20 @@ def modify_intrusion_prevention_policy(api, configuration, api_version, api_exce
     :param api_version: The version of the API to use.
     :param api_exception: The Deep Security API exception module.
     :param policy_id: The ID of the policy to modify.
-    :return: A PoliciesApi object with the modified policy.
+    :param rule_ids: The IDs of the Intrusion Prevention rules to assign.
+    :return: The ID of the modified policy.
     """
+
+    # Run in prevent mode
+    ip_policy_extension = api.IntrusionPreventionPolicyExtension()
+    ip_policy_extension.state = "prevent"
+
+    # Assign rules
+    ip_policy_extension.rule_ids = rule_ids
+
+    # Add to a policy
+    policy = api.Policy()
+    policy.IntrusionPrevention = ip_policy_extension
 
     # Configure the setting
     policy_settings = api.PolicySettings()
@@ -31,14 +43,13 @@ def modify_intrusion_prevention_policy(api, configuration, api_version, api_exce
     policy_settings.intrusion_prevention_setting_auto_apply_recommendations_enables = setting_value
 
     # Add the setting to a policy
-    policy = api.Policy()
     policy.policy_settings = policy_settings
 
     try:
         # Modify the policy on Deep Security Manager
         policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        return policies_api.modify_policy(policy_id, policy, api_version)
-
+        modified_policy = policies_api.modify_policy(policy_id, policy, api_version)
+        return modified_policy.id
     except api_exception as e:
         return "Exception: " + str(e)
 

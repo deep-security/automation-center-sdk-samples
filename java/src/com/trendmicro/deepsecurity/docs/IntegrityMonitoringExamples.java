@@ -22,32 +22,38 @@ import com.trendmicro.deepsecurity.ApiException;
 import com.trendmicro.deepsecurity.api.PoliciesApi;
 import com.trendmicro.deepsecurity.model.Policy;
 import com.trendmicro.deepsecurity.model.IntegrityMonitoringPolicyExtension;
+import com.trendmicro.deepsecurity.model.IntegrityMonitoringPolicyExtension.StateEnum;
 
 /**
  * Configures the Integrity Monitoring module.
  */
 public class IntegrityMonitoringExamples {
 	/**
-	 * Adds Integrity Monitoring rules to a policy.
+	 * Turns on Integrity Monitoring and adds Integrity Monitoring rules for a policy.
 	 * 
 	 * @param policyID The ID of the policy to modify.
 	 * @param ruleIds A List of rule IDs to add.
 	 * @param apiVersion The version of the API to use.
 	 * @throws ApiException if a problem occurs when modifying the policy on Deep Security Manager.
-	 * @return The modified policy.
+	 * @return The ID of the modified policy.
 	 */
-	public static Policy configureIntegrityMonitoring(Integer policyId, List<Integer> ruleIds, String apiVersion) throws ApiException {
+	public static Integer configureIntegrityMonitoring(Integer policyId, List<Integer> ruleIds, String apiVersion) throws ApiException {
 
-		// Add the rule IDs to a policy
+		// Set the state
 		IntegrityMonitoringPolicyExtension integrityMonitoringPolicyExtension = new IntegrityMonitoringPolicyExtension();
-		for (Integer ruleId : ruleIds) {
-			integrityMonitoringPolicyExtension.addRuleIDsItem(ruleId);
-		}
+		integrityMonitoringPolicyExtension.setState(StateEnum.ON);
+		
+		// Add the rule IDs
+		integrityMonitoringPolicyExtension.setRuleIDs(ruleIds);
+		
+		// Add to a policy
 		Policy policy = new Policy();
 		policy.setIntegrityMonitoring(integrityMonitoringPolicyExtension);
 
 		// Update the policy on Deep Security Manager
 		PoliciesApi policiesApi = new PoliciesApi();
-		return policiesApi.modifyPolicy(policyId, policy, Boolean.FALSE, apiVersion);
+		Policy modifiedPolicy = policiesApi.modifyPolicy(policyId, policy, Boolean.FALSE, apiVersion);
+		
+		return modifiedPolicy.getID();
 	}
 }

@@ -262,10 +262,11 @@ ComputerStatusExamples.checkAntiMalware(api, computerID, apiVersion)
 /*
 // ### Firewall Examples ###
 const FirewallExample = require("./lib/FirewallExample.js");
+const ruleIDs = [1, 2, 3, 4];
 
-FirewallExample.modifyFirewallPolicy(api, policyID, apiVersion)
-  .then(modifiedPolicy => {
-    console.log(`Policy ${modifiedPolicy.ID} has Firewall state ${modifiedPolicy.firewall.state}`);
+FirewallExample.modifyFirewallPolicy(api, ruleIDs, policyID, apiVersion)
+  .then(modifiedPolicyID => {
+    console.log(`Modified policy ${modifiedPolicyID}.`);
   })
   .catch(error => {
     console.log(`Error setting Firewall state: ${error}`);
@@ -277,8 +278,8 @@ const WebReputationExample = require("./lib/WebReputationExample.js");
 
 let securityLevel = 80; // Change as required
 WebReputationExample.configureWebReputation(api, policyID, securityLevel, apiVersion)
-  .then(modifiedPolicy => {
-    console.log(`Policy  ${modifiedPolicy.ID} has Web Reputation state ${modifiedPolicy.webReputation.state}`);
+  .then(modifiedPolicyID => {
+    console.log(`Modified policy ${modifiedPolicyID}.`);
   })
   .catch(error => {
     console.log(`Error setting Web Reputation state: ${error}`);
@@ -290,10 +291,8 @@ const IntegrityMonitoringExample = require("./lib/IntegrityMonitoringExample.js"
 let imRules = [1, 2]; // Change as required
 
 IntegrityMonitoringExample.configureIntegrityMonitoring(api, policyID, imRules, apiVersion)
-  .then(modifiedPolicy => {
-    console.log(
-      `Policy ${modifiedPolicy.ID} has Integrity Monitoring state ${modifiedPolicy.integrityMonitoring.state}`
-    );
+  .then(modifiedPolicyID => {
+    console.log(`Policy ${modifiedPolicyID} is successfully modified.`);
   })
   .catch(error => {
     console.log(`Error setting Integrity Monitoring state: ${error}`);
@@ -305,8 +304,8 @@ const LogInspectionExample = require("./lib/LogInspectionExample.js");
 let liRules = [1]; // Change as required
 
 LogInspectionExample.configureLogInspection(api, policyID, liRules, apiVersion)
-  .then(modifiedPolicy => {
-    console.log(`Policy ${modifiedPolicy.ID} has Log Inpsection state ${modifiedPolicy.logInspection.state}`);
+  .then(modifiedPolicyID => {
+    console.log(`Policy ${modifiedPolicyID} is updated.`);
   })
   .catch(error => {
     console.log(`Error setting Log Inspection state: ${error}`);
@@ -354,14 +353,11 @@ ApplicationControlExample.configureApplicationControl(api, policyID, apiVersion)
 /*
 // ### Intrusion Prevention Examples ###
 const IntrusionPreventionExample = require("./lib/IntrusionPreventionExample.js");
+const ipRuleIDs = [1, 2, 3, 4];
 
-IntrusionPreventionExample.modifyIntrusionPreventionPolicy(api, policyID, apiVersion)
-  .then(modifiedPolicy => {
-    console.log(
-      `Policy ${modifiedPolicy.ID} has intrusionPreventionSettingAutoApplyRecommendationsEnabled value ${
-        modifiedPolicy.policySettings.intrusionPreventionSettingAutoApplyRecommendationsEnabled.value
-      }`
-    );
+IntrusionPreventionExample.modifyIntrusionPreventionPolicy(api, policyID, ipRuleIDs, apiVersion)
+  .then(modifiedPolicyID => {
+    console.log(`Modified policy ${modifiedPolicyID}.`);
   })
   .catch(error => {
     console.log(`Error configuring Intrusion Prevention: ${error}`);

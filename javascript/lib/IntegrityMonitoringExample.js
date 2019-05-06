@@ -15,17 +15,20 @@
  */
 
 /*
- * Adds Integrity Monitoring rules to a policy.
+ * Turns on Integrity Monitoring and adds Integrity Monitoring rules for a policy.
  * @param {Object} api The Deep Security API modules.
  * @param {Number} policyId The ID of the policy to modify.
  * @param {[Number]} imRules An array of integrity monitoring rule IDs.
  * @param {String} apiVersion The version of the api to use.
- * @returns {Promise} A promise that contains the modified policy
+ * @returns {Promise} A promise that contains the ID of the modified policy
  */
 exports.configureIntegrityMonitoring = function(api, policyID, imRules, apiVersion) {
   return new Promise((resolve, reject) => {
-    // Add rule IDs to a PolicyLevelConfigurationForTheIntegrityMonitoringModule object
+    // Turn on Integrity Monitoring
     const integrityMonitoringPolicyExtension = new api.IntegrityMonitoringPolicyExtension();
+    integrityMonitoringPolicyExtension.state = api.IntegrityMonitoringPolicyExtension.StateEnum.on;
+
+    // Add rule IDs
     integrityMonitoringPolicyExtension.ruleIDs = imRules;
 
     // Add to a policy
@@ -39,8 +42,8 @@ exports.configureIntegrityMonitoring = function(api, policyID, imRules, apiVersi
     };
 
     return modify()
-      .then(data => {
-        resolve(data);
+      .then(modifiedPolicy => {
+        resolve(modifiedPolicy.ID);
       })
       .catch(error => {
         reject(error);

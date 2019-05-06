@@ -13,15 +13,16 @@
 # limitations under the License.
 #
 
-def modify_firewall_policy(api, configuration, api_version, api_exception, policy_id):
-    """ Modifies a policy to set the firewall state to on and disables reconnaissance scan.
+def modify_firewall_policy(api, configuration, api_version, api_exception, rule_ids, policy_id):
+    """ Modifies a policy to set the firewall state to on, assigns rules, and enables reconnaissance scan.
 
     :param api: The Deep Security API modules.
     :param configuration: Configuration object to pass to the api client.
     :param api_version: The version of the API to use.
     :param api_exception: The Deep Security API exception module.
+    :param rule_ids: The Firewall rules to assign to the policy.
     :param policy_id: The ID of the policy to modify.
-    :return: A PoliciesApi object that contains the ID of the modified policy.
+    :return: The modified policy.
     """
     #
     policies_api = api.PoliciesApi(api.ApiClient(configuration))
@@ -31,13 +32,16 @@ def modify_firewall_policy(api, configuration, api_version, api_exception, polic
     # Turn on firewall
     firewall_policy_extension.state = "on"
 
+    # Assign rules
+    firewall_policy_extension.rule_ids = rule_ids;
+
     # Add the firewall state to the policy
     policy.firewall = firewall_policy_extension
 
-    # Turn off reconnaissance scan
+    # Turn on reconnaissance scan
     policy_settings = api.PolicySettings()
     setting_value = api.SettingValue()
-    setting_value.value = False
+    setting_value.value = True
     policy_settings.firewall_setting_reconnaissance_enabled = setting_value
 
     # Add reconnaissance scan state to the policy
@@ -45,8 +49,7 @@ def modify_firewall_policy(api, configuration, api_version, api_exception, polic
 
     try:
         # Modify the policy on Deep Security Manager
-        policies = policies_api.modify_policy(policy_id, policy, api_version)
-        return policies
+        return policies_api.modify_policy(policy_id, policy, api_version)
 
     except api_exception as e:
         return "Exception: " + str(e)

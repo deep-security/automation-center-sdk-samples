@@ -14,7 +14,7 @@
 #
 
 def configure_log_inspection(api, configuration, api_version, api_exception, policy_id, li_rules):
-    """ Adds a log inspection rule to a policy.
+    """ Turns on Log Inspection and adds a Log Inspection rule for a policy.
 
     :param api: The Deep Security API modules.
     :param configuration: Configuration object to pass to the api client.
@@ -22,21 +22,25 @@ def configure_log_inspection(api, configuration, api_version, api_exception, pol
     :param api_exception: The Deep Security API exception module.
     :param policy_id: The ID of the policy to modify.
     :param li_rules: A list of log inspection rule IDs to add.
-    :return: A PoliciesApi object containing a policy containing the added log inspection rules.
+    :return: The ID of the modified policy.
     """
 
-    # Add log inspection rules to the policy from li_rules
-    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+    # Set the state
     policy_config_log_inspection = api.LogInspectionPolicyExtension()
+    policy_config_log_inspection.state = "on"
+
+    # Add the rules
     policy_config_log_inspection.rule_ids = li_rules
 
-    # Update the policy with the log inspection rules
+    # Add to a policy
     policy = api.Policy()
     policy.log_inspection = policy_config_log_inspection
 
     try:
         # Modify the policy on Deep Security Manager
-        return policies_api.modify_policy(policy_id, policy, api_version)
+        policies_api = api.PoliciesApi(api.ApiClient(configuration))
+        modified_policy = policies_api.modify_policy(policy_id, policy, api_version)
+        return modified_policy.id
 
     except api_exception as e:
         return "Exception: " + str(e)

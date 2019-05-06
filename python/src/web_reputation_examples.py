@@ -22,7 +22,7 @@ def configure_web_reputation(api, configuration, api_version, api_exception, pol
     :param api_exception: The Deep Security API exception module.
     :param policy_id: The ID of the policy to modify.
     :param security_level: The security level to set for Web Reputation.
-    :return:
+    :return: The ID of the modified policy.
     """
 
     # Enable Web Reputation
@@ -50,8 +50,8 @@ def configure_web_reputation(api, configuration, api_version, api_exception, pol
     try:
         # Modify the policy on Deep Security Manager
         policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        return policies_api.modify_policy(policy_id, policy, api_version)
-
+        modified_policy = policies_api.modify_policy(policy_id, policy, api_version)
+        return modified_policy.id
     except api_exception as e:
         return "Exception: " + str(e)
 

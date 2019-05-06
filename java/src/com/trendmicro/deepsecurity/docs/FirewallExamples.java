@@ -16,6 +16,8 @@
 
 package com.trendmicro.deepsecurity.docs;
 
+import java.util.List;
+
 import com.trendmicro.deepsecurity.ApiException;
 import com.trendmicro.deepsecurity.api.PoliciesApi;
 import com.trendmicro.deepsecurity.model.Policy;
@@ -28,18 +30,22 @@ import com.trendmicro.deepsecurity.model.SettingValue;
  */
 public class FirewallExamples {
 	/**
-	 * Modifies a policy to set the Firewall state to ON and enable reconnaissance scan.
+	 * Modifies a policy to set the Firewall state to ON, assing rules, and enable reconnaissance scan.
 	 * 
 	 * @param policyId The ID of the policy to modify.
+	 * @param ruleIDs A list of Firewall rule IDs to assign to the policy.
 	 * @param apiVersion The version of the API to use.
 	 * @throws ApiException if a problem occurs when modifying the policy on Deep Security Manager.
 	 * @return The modified policy.
 	 */
-	public static Policy modifyFirewallPolicy(Integer policyId, String apiVersion) throws ApiException {
+	public static Policy setUpFirewallPolicy(Integer policyId, List<Integer> ruleIDs, String apiVersion) throws ApiException {
 
 		// Turn on Firewall
 		FirewallPolicyExtension firewallPolicyExtension = new FirewallPolicyExtension();
 		firewallPolicyExtension.setState(FirewallPolicyExtension.StateEnum.ON);
+		
+		// Add rules
+		firewallPolicyExtension.setRuleIDs(ruleIDs);
 
 		// Add to the policy
 		Policy policy = new Policy();
