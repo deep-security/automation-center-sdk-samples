@@ -52,8 +52,6 @@ public class IntegrityMonitoringExamples {
 
 		// Update the policy on Deep Security Manager
 		PoliciesApi policiesApi = new PoliciesApi();
-		Policy modifiedPolicy = policiesApi.modifyPolicy(policyId, policy, Boolean.FALSE, apiVersion);
-		
-		return modifiedPolicy.getID();
-	}
+		return policiesApi.modifyPolicy(policyId, policy, Boolean.FALSE, apiVersion).getID();
+			}
 }
