@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 
+
 def modify_intrusion_prevention_policy(api, configuration, api_version, api_exception, policy_id, rule_ids):
     """ Turns on the automatic application of recommendation scans for intrusion prevention in a policy.
 
@@ -64,10 +65,13 @@ def get_assigned_intrusion_prevention_rules(api, configuration, api_version, api
     :return: A dictionary of objects that contain the computer host name and their assigned rules or None if no rules.
     """
 
+    # Include Intrusion Prevention information in the returned Computer objects
+    expand = api.Expand(api.Expand.intrusion_prevention)
+
     try:
         # Retrieve computers from Deep Security Manager
         computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers_list = computers_api.list_computers(api_version)
+        computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
         # Extract intrusion prevention rules from the computers
         im_rules = {}

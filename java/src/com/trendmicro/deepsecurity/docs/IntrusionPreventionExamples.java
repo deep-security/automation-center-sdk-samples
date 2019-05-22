@@ -25,6 +25,7 @@ import com.trendmicro.deepsecurity.api.ComputersApi;
 import com.trendmicro.deepsecurity.api.PoliciesApi;
 import com.trendmicro.deepsecurity.model.Computer;
 import com.trendmicro.deepsecurity.model.Computers;
+import com.trendmicro.deepsecurity.model.Expand;
 import com.trendmicro.deepsecurity.model.IntrusionPreventionComputerExtension;
 import com.trendmicro.deepsecurity.model.IntrusionPreventionPolicyExtension;
 import com.trendmicro.deepsecurity.model.IntrusionPreventionPolicyExtension.StateEnum;
@@ -82,9 +83,12 @@ public class IntrusionPreventionExamples {
 	public static Map<Integer, List<Integer>> getIntrusionPreventionRules(String apiVersion) throws ApiException {
 		Map<Integer, List<Integer>> computerRules = new HashMap<>();
 		ComputersApi computersApi = new ComputersApi();
+		
+		// Include Intrusion Prevention information in the returned Computer objects
+		Expand expand = new Expand(Expand.OptionsEnum.INTRUSION_PREVENTION);
 
 		// Get all computer IDs
-		Computers computers = computersApi.listComputers(Boolean.FALSE, apiVersion);
+		Computers computers = computersApi.listComputers(expand.list(), Boolean.FALSE, apiVersion);
 
 		// For each computer, get the IDs for the assigned rules
 		for (Computer computer : computers.getComputers()) {

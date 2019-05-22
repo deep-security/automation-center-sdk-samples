@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-/*
+/**
  * Overrides a computer to enable Firewall reconnaissance scan.
  * @param {ApiClient} api The Deep Security API exports.
  * @param {Number} computerID The ID of the computer.
  * @param {String} apiVersion The API version to use.
  * @returns {Promise} A promise object that resolves to the computer settings object.
  */
-exports.overrideReconnaissanceScan = function(api, computerID, apiVersion) {
+exports.overrideReconnaissanceScan = function (api, computerID, apiVersion) {
   return new Promise((resolve, reject) => {
     const settingValue = new api.SettingValue();
     settingValue.value = "false";
@@ -44,23 +44,19 @@ exports.overrideReconnaissanceScan = function(api, computerID, apiVersion) {
   });
 };
 
-/*
+/**
  * Obtains a Computer object that contains only overrides.
  * @param {ApiClient} api The Deep Security API exports.
+ * @param {Object} expand An Expand object that contains a list of computer properties to include in the returned Computer object.
  * @param {Number} computerID The ID of the computer.
  * @param {String} apiVersion The API version to use.
- * @returns {Promise} A promise object that resolves to the computer object.
+ * @returns {Promise} A promise object that resolves to the computer ID
  */
-exports.getComputerOverrides = function(api, computerID, apiVersion) {
-  return new Promise((resolve, reject) => {
-    const computersApi = new api.ComputersApi();
-    computersApi
-      .describeComputer(computerID, apiVersion, { overrides: true })
-      .then(computer => {
-        resolve(computer);
-      })
-      .catch(error => {
-        reject(error);
-      });
-  });
+exports.getComputerOverrides = function (api, expand, computerID, apiVersion) {
+  const computersApi = new api.ComputersApi();
+  const opts = {
+    overrides: true,
+    expand: expand.list()
+  };
+  return computersApi.describeComputer(computerID, apiVersion, opts);
 };

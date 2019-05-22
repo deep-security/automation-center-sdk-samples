@@ -20,6 +20,7 @@ import com.trendmicro.deepsecurity.ApiException;
 import com.trendmicro.deepsecurity.api.ComputersApi;
 import com.trendmicro.deepsecurity.model.Computer;
 import com.trendmicro.deepsecurity.model.ComputerSettings;
+import com.trendmicro.deepsecurity.model.Expand;
 import com.trendmicro.deepsecurity.model.SettingValue;
 
 /**
@@ -55,14 +56,15 @@ public class ComputerOverrideExamples {
 	 * Obtains a Computer object that contains only overrides.
 	 * 
 	 * @param comptuerId The ID of the computer.
+	 * @param expand The list of computer properties to include in the returned Computer object. 
 	 * @param apiVersion The version of the API to use.
 	 * @throws ApiException if a problem occurs when getting the computer from Deep Security Manager.
-	 * @return The computer object with overrides.
+	 * @return The Computer object with overrides.
 	 */
-	public static Computer getComputerOverrides(Integer computerId, String apiVersion) throws ApiException {
+	public static Computer getComputerOverrides(Integer computerId, Expand expand, String apiVersion) throws ApiException {
 		ComputersApi computersApi = new ComputersApi();
 
 		// Set the overrides parameter to true
-		return computersApi.describeComputer(computerId, Boolean.TRUE, apiVersion);
+		return computersApi.describeComputer(computerId, expand.list(), Boolean.TRUE, apiVersion);
 	}
 }

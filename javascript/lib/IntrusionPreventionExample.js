@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/*
+/**
  * Turns on the automatic application of recommendation scans for Intrusion Prevention in a policy.
  * @param {Object} api The Deep Security API modules.
  * @param {Number} policyId The ID of the policy to modify.
@@ -22,7 +22,7 @@
  * @param {String} apiVersion The version of the api to use.
  * @returns {Promise} A promise that contains the ID of the modified policy.
  */
-exports.modifyIntrusionPreventionPolicy = function(api, policyID, ruleIDs, apiVersion) {
+exports.modifyIntrusionPreventionPolicy = function (api, policyID, ruleIDs, apiVersion) {
   return new Promise((resolve, reject) => {
     const policy = new api.Policy();
     const policiesApi = new api.PoliciesApi();
@@ -47,7 +47,7 @@ exports.modifyIntrusionPreventionPolicy = function(api, policyID, ruleIDs, apiVe
     policy.policySettings = policySettings;
 
     // Modifies the policy on Deep Security Manager
-    const modify = function() {
+    const modify = function () {
       return policiesApi.modifyPolicy(policyID, policy, apiVersion, { overrides: false });
     };
 
@@ -61,19 +61,26 @@ exports.modifyIntrusionPreventionPolicy = function(api, policyID, ruleIDs, apiVe
   });
 };
 
-/*
+/**
  * Retrieves the Intrusion Prevention rules that are applied to all computers.
  * @param {Object} api The Deep Security API modules.
  * @param {String} apiVersion The version of the api to use.
  * @return {Promise} A promise that contains an array of objects that contain
  * the computer host name and their assigned rules or undefined if no rules.
  */
-exports.getAssignedIntrusionPreventionRules = function(api, apiVersion) {
+exports.getAssignedIntrusionPreventionRules = function (api, apiVersion) {
   return new Promise((resolve, reject) => {
     // Retreives computers from Deep Security Manager
-    const getComputers = function() {
+    const getComputers = function () {
+      // Include Intrusion Prevention information in the returned Computer objects
+      const Options = api.Expand.OptionsEnum;
+      const expand = new api.Expand.Expand(Options.intrusionPrevention);
+      const opts = {
+        expand: expand.list(),
+        overrides: false
+      };
       const computersApi = new api.ComputersApi();
-      return computersApi.listComputers(apiVersion, { overrides: false });
+      return computersApi.listComputers(apiVersion, opts);
     };
 
     // Extracts intrusion prevention rules from computers
