@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
-/*
+/**
  * Obtains agent and appliance status for all comptuters
  * and provides the results as comma-separated values.
  * @param {object} api The api module.
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains a string of values in CSV format.
  */
-exports.getComputerStatuses = function(api, apiVersion) {
+exports.getComputerStatuses = function (api, apiVersion) {
   return new Promise((resolve, reject) => {
     // Obtains a list of all computers
     const getListOfComputers = () => {
+      // Include computer status information in returned Computer objects
+      const Options = api.Expand.OptionsEnum;
+      const expand = new api.Expand.Expand(Options.computerStatus);
+      const opts = {
+        expand: expand.list(),
+        overrides: false
+      };
+
       const computersApi = new api.ComputersApi();
-      return computersApi.listComputers(apiVersion, { overrides: false });
+      return computersApi.listComputers(apiVersion, opts);
     };
     // Add column titles to comma-separated values string
     let csv = "Host Name, Agent or Appliance, Status, Status Messages, Tasks\r\n";
@@ -95,12 +103,21 @@ exports.getComputerStatuses = function(api, apiVersion) {
   });
 };
 
-exports.getAntiMalwareStatusForComputers = function(api, apiVersion) {
+exports.getAntiMalwareStatusForComputers = function (api, apiVersion) {
   return new Promise((resolve, reject) => {
     // Obtains a list of all computers
     const getListOfComputers = () => {
       const computersApi = new api.ComputersApi();
-      return computersApi.listComputers(apiVersion, { overrides: false });
+
+      // Include Anti-Malware information in returned Computer objects
+      const Options = api.Expand.OptionsEnum;
+      const expand = new api.Expand.Expand(Options.antiMalware);
+      const opts = {
+        expand: expand.list(),
+        overrides: false
+      };
+
+      return computersApi.listComputers(apiVersion, opts);
     };
     // Add column titles to comma-separated values string
     let csv = "Host Name, Module State, Agent or Appliance, Status, Status Message\r\n";
@@ -152,7 +169,7 @@ exports.getAntiMalwareStatusForComputers = function(api, apiVersion) {
 
 // PRIVATE METHODS //
 
-/*
+/**
  * Converts an array of string values into a string of comma-separated values.
  * @param {Array} values The array of values.
  * @return {String} The string of comma-separated values.
@@ -170,7 +187,7 @@ function formatForCSV(values) {
   return csvLine;
 }
 
-/*
+/**
  * Obtains certain Anti-Malware properties for a computer.
  * @param {object} api The api module.
  * @param {Number} computerID The ID of the computer.
@@ -178,16 +195,23 @@ function formatForCSV(values) {
  * @return {Promise} A promise that contains on object of Anti-Malware properties.
  */
 
-exports.checkAntiMalware = function(api, computerID, apiVersion) {
+exports.checkAntiMalware = function (api, computerID, apiVersion) {
   return new Promise((resolve, reject) => {
     let amStatus, computer;
 
     // Gets the computer object from Deep Security Manager
     const getComputer = () => {
       const computersApi = new api.ComputersApi();
-      return computersApi.describeComputer(computerID, apiVersion, {
+
+      // Include Anti-Malware and computer settings information in returned Computer objects
+      const Options = api.Expand.OptionsEnum;
+      const expand = new api.Expand.Expand(Options.antiMalware, Options.computerSettings);
+      const opts = {
+        expand: expand.list(),
         overrides: false
-      });
+      };
+
+      return computersApi.describeComputer(computerID, apiVersion, opts);
     };
 
     // Gets the malware scan configuration for a computer
@@ -231,7 +255,7 @@ function getAntiMalwareInfo(computer) {
   return status;
 }
 
-/*
+/**
  * Finds the Intrusion Prevention rules that protect against a CVE.
  * @param {object} api The api module.
  * @param {Number} cveID The ID of the CVE (for example CVE-2016-7214) or
@@ -239,7 +263,7 @@ function getAntiMalwareInfo(computer) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the rule IDs.
  */
-exports.findRulesForCVE = function(api, cveID, apiVersion) {
+exports.findRulesForCVE = function (api, cveID, apiVersion) {
   const ruleIDs = [];
 
   // Search for Intrusion Prevention rules
@@ -255,9 +279,12 @@ exports.findRulesForCVE = function(api, cveID, apiVersion) {
       const searchFilter = new api.SearchFilter();
       searchFilter.searchCriteria = [cveCriteria];
 
-      // Add the search filter to a search options object
+      // Add the search filter to a search options object, and include Intrusion Prevention in the results
+      const Options = api.Expand.OptionsEnum;
+      const expand = new api.Expand.Expand(Options.intrusionPrevention);
       const searchOptions = {
         searchFilter: searchFilter,
+        expand: expand.list(),
         overrides: false
       };
 
@@ -280,23 +307,30 @@ exports.findRulesForCVE = function(api, cveID, apiVersion) {
   });
 };
 
-/*
+/**
  * Finds computers that are not assigned a specific Intrusion Prevention rule.
  * @param {object} api The api module.
  * @param {Number} ruleID The ID of the rule.
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains an array of IDs of unprotected computers.
  */
-exports.checkComputersForIPRule = function(api, ruleID, apiVersion) {
+exports.checkComputersForIPRule = function (api, ruleID, apiVersion) {
   return new Promise((resolve, reject) => {
     // Retrieves computers from Deep Security Manager
     const getComputers = () => {
+      // Include information about Intrusion Prevention in the returned objects
+      const Options = api.Expand.OptionsEnum;
+      const expand = new api.Expand.Expand(Options.intrusionPrevention);
+      const opts = {
+        expand: expand.list(),
+        overrides: false
+      };
       const computersApi = new api.ComputersApi();
-      return computersApi.listComputers(apiVersion, { overrides: false });
+      return computersApi.listComputers(apiVersion, opts);
     };
 
     // Finds computers that are not assigned the rule
-    const checkForRule = function(computers) {
+    const checkForRule = function (computers) {
       let unprotected = [];
       for (let i = 0; i < computers.computers.length; i++) {
         if (computers.computers[i].intrusionPrevention !== undefined) {
@@ -328,7 +362,7 @@ exports.checkComputersForIPRule = function(api, ruleID, apiVersion) {
   });
 };
 
-/*
+/**
  * Assigns an Intrusion Prevention rule to the policy that is assigned to a computer.
  * @param {object} api The api module.
  * @param {Computer} computer The Computer that is assigned a policy.
@@ -337,7 +371,7 @@ exports.checkComputersForIPRule = function(api, ruleID, apiVersion) {
  * @return {Promise} A promise that contains the modified policy.
  */
 
-exports.applyRuleToPolicy = function(api, computer, ruleID, apiVersion) {
+exports.applyRuleToPolicy = function (api, computer, ruleID, apiVersion) {
   return new Promise((resolve, reject) => {
     // Retrieves the policy that we are modifying
     const getPolicy = policyID => {
@@ -388,7 +422,7 @@ exports.applyRuleToPolicy = function(api, computer, ruleID, apiVersion) {
   });
 };
 
-/*
+/**
  * Obtains the list of recommended Intrusion Prevention rules to apply to a computer,
  * according to the results of the last recommendation scan.* @param {object} api The api module.
  * @param {object} api The api module.
@@ -396,7 +430,7 @@ exports.applyRuleToPolicy = function(api, computer, ruleID, apiVersion) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the recommended rules.
  */
-exports.getRecommendedIPRules = function(api, computerID, apiVersion) {
+exports.getRecommendedIPRules = function (api, computerID, apiVersion) {
   return new Promise((resolve, reject) => {
     // Obtains the results of the recommendation scan
     const getRecommendations = () => {

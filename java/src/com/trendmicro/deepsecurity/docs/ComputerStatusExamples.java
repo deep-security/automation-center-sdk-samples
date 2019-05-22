@@ -36,6 +36,7 @@ import com.trendmicro.deepsecurity.model.ComputerModuleStatus.AgentStatusEnum;
 import com.trendmicro.deepsecurity.model.ComputerModuleStatus.ApplianceStatusEnum;
 import com.trendmicro.deepsecurity.model.ComputerStatus;
 import com.trendmicro.deepsecurity.model.Computers;
+import com.trendmicro.deepsecurity.model.Expand;
 import com.trendmicro.deepsecurity.model.IntrusionPreventionAssignments;
 import com.trendmicro.deepsecurity.model.IntrusionPreventionComputerExtension;
 import com.trendmicro.deepsecurity.model.IntrusionPreventionRule;
@@ -62,10 +63,13 @@ public class ComputerStatusExamples {
 
 		// Add column titles to comma-separated values
 		StringBuilder csv = new StringBuilder("Host Name, Agent or Appliance, Status, Status Messages, Tasks\r\n");
+		
+		// Include computer status information in the returned Computer objects
+		Expand expand = new Expand(Expand.OptionsEnum.COMPUTER_STATUS);
 
 		// Get all computers
 		ComputersApi computersApi = new ComputersApi();
-		Computers computers = computersApi.listComputers(Boolean.FALSE, apiVersion);
+		Computers computers = computersApi.listComputers(expand.list(), Boolean.FALSE, apiVersion);
 
 		for (Computer computer : computers.getComputers()) {
 			List<String> computerInfo = new ArrayList<>();
@@ -162,10 +166,13 @@ public class ComputerStatusExamples {
 
 		// Add titles to comma-separated values
 		StringBuilder csv = new StringBuilder("Host Name, Module State, Agent or Appliance, Status, Status Message\r\n ");
+		
+		// Include Anti-Malware information in the returned Computer objects
+		Expand expand = new Expand(Expand.OptionsEnum.ANTI_MALWARE);
 
 		// Get a list of computers
 		ComputersApi computersApi = new ComputersApi();
-		Computers computers = computersApi.listComputers(Boolean.FALSE, apiVersion);
+		Computers computers = computersApi.listComputers(expand.list(), Boolean.FALSE, apiVersion);
 
 		for (Computer computer : computers.getComputers()) {
 
@@ -227,9 +234,12 @@ public class ComputerStatusExamples {
 
 		ComputersApi computersApi = new ComputersApi();
 		AntiMalwareConfigurationsApi amConfigApi = new AntiMalwareConfigurationsApi();
+		
+		// Include Anti-Malware information in the returned Computer objects
+		Expand expand = new Expand(Expand.OptionsEnum.ANTI_MALWARE, Expand.OptionsEnum.COMPUTER_SETTINGS);
 
 		// Get all computers
-		Computers computers = computersApi.listComputers(Boolean.FALSE, apiVersion);
+		Computers computers = computersApi.listComputers(expand.list(), Boolean.FALSE, apiVersion);
 		for (Computer computer : computers.getComputers()) {
 
 			// Get properties for each computer
@@ -302,8 +312,11 @@ public class ComputerStatusExamples {
 	public static Computers checkComputersForIPRule(Integer ruleID, String apiVersion) throws ApiException {
 		Computers needsRule = new Computers();
 		ComputersApi computersApi = new ComputersApi();
+		
+		// Include Intrusion Prevention information in the returned Computer objects
+		Expand expand = new Expand(Expand.OptionsEnum.INTRUSION_PREVENTION);
 
-		Computers computers = computersApi.listComputers(Boolean.FALSE, apiVersion);
+		Computers computers = computersApi.listComputers(expand.list(), Boolean.FALSE, apiVersion);
 		for (Computer computer : computers.getComputers()) {
 			IntrusionPreventionComputerExtension ipExt = computer.getIntrusionPrevention();
 			if (ipExt.getRuleIDs() == null || !ipExt.getRuleIDs().contains(ruleID)) {

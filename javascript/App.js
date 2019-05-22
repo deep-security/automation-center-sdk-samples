@@ -25,7 +25,7 @@ const api = require("@trendmicro/deepsecurity");
 const fs = require("fs");
 
 // Get the DSM URL and API key from the properties.json file
-const rawProperties = fs.readFileSync("properties.json");
+const rawProperties = fs.readFileSync("./properties.json");
 const properties = JSON.parse(rawProperties);
 
 // Configure ApiClient
@@ -39,7 +39,7 @@ DefaultAuthentication.apiKey = properties.secretkey;
 
 //Environment values -- change as needed
 let auditorRoleId = 2;
-let computerID = 801;
+let computerID = 2;
 let policyID = 1;
 let realTimeScanConfigID = 1;
 let directoryListID = 1;
@@ -251,6 +251,14 @@ CommonObjectsExamples.setExclusionDirRealTimeScan(api, directoryListID, realTime
     console.log(`Error modifying malware scan configuration: ${error}`);
   });
 
+ComputerStatusExamples.getAntiMalwareStatusForComputers(api, apiVersion)
+  .then(csv => {
+    console.log(`Returned CSV text: ${csv}`);
+  })
+  .catch(error => {
+    console.log(`Error getting Anti-Malware statuses: ${error}`);
+  });
+
 ComputerStatusExamples.checkAntiMalware(api, computerID, apiVersion)
   .then(amSettings => {
     console.log(`Computer ${computerID} has Anti-Malware settings ${JSON.stringify(amSettings, null, 4)}`);
@@ -403,6 +411,17 @@ ComputerStatusExamples.getRecommendedIPRules(api, computerID, apiVersion)
   });
 */
 /*
+// ### Computer Status Examples ###
+
+ComputerStatusExamples.getComputerStatuses(api, apiVersion)
+  .then(csv => {
+    console.log(`Returned CSV text: ${csv}`);
+  })
+  .catch(error => {
+    console.log(`Error getting computer statuses: ${error}`);
+  });
+*/
+/*
 // ### Computer Override Examples ###
 const ComputerOverrideExamples = require("./lib/ComputerOverrideExamples.js");
 
@@ -418,11 +437,14 @@ ComputerOverrideExamples.overrideReconnaissanceScan(api, computerID, apiVersion)
     console.log(`Error setting firewallSettingReconnaissanceEnabled: ${error}`);
   });
 
-ComputerOverrideExamples.getComputerOverrides(api, computerID, apiVersion)
+const Options = api.Expand.OptionsEnum;
+const expand = new api.Expand.Expand(Options.intrusionPrevention);
+
+ComputerOverrideExamples.getComputerOverrides(api, expand, computerID, apiVersion)
   .then(overrides => {
     console.log(`getComputerOverrides returned: \n`);
-    Object.keys(overrides).forEach(function(key, index) {
-      if (overrides[key] !== undefined) console.log(`${key} = ${overrides[key]}`);
+    Object.keys(overrides).forEach(function (key, index) {
+      if (overrides[key] !== undefined) console.log(`${key} = ${JSON.stringify(overrides[key])}`);
     });
   })
   .catch(error => {
@@ -476,7 +498,7 @@ SearchExamples.searchUpdatedIntrusionPreventionRules(api, numberOfDays, apiVersi
   .then(searchResults => {
     console.log(
       `Found ${
-        searchResults.intrusionPreventionRules.length
+      searchResults.intrusionPreventionRules.length
       } rules that have been updated within the last ${numberOfDays} days`
     );
   })
@@ -494,10 +516,13 @@ SearchExamples.pagedSearchComputers(api, apiVersion)
 */
 /*
 // ### Tenant examples ###
+
 // NOTE: Not applicable for DSaaS instances
 const TenantExample = require("./lib/TenantExample.js");
+
 let accountName = "TestAccount";
 let tenantID;
+
 TenantExample.createTenant(api, accountName, apiVersion)
   .then(newTenant => {
     tenantID = newTenant.ID;
@@ -506,7 +531,6 @@ TenantExample.createTenant(api, accountName, apiVersion)
   .catch(error => {
     console.log(`Error creating tenant: ${error}`);
   });
-
 
 TenantExample.getIPStatesForTenant(api, tenantID, apiVersion)
   .then(computerAndIPStates => {
@@ -517,10 +541,10 @@ TenantExample.getIPStatesForTenant(api, tenantID, apiVersion)
   });
 
 TenantExample.getIpRulesForTenantComputers(api, apiVersion, properties.secretkey)
-  .then(function(tenantComputersAndRules) {
+  .then(function (tenantComputersAndRules) {
     console.log(`Obtained Intrusion Prevention rules for ${tenantComputersAndRules.length} tenants`);
   })
-  .catch(function(error) {
+  .catch(function (error) {
     console.log(`Error iterating tenants to get assigned Intrusion Prevention rules: ${error}`);
   });
 

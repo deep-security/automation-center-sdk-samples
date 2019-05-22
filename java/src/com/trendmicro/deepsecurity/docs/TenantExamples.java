@@ -36,6 +36,7 @@ import com.trendmicro.deepsecurity.model.Administrator;
 import com.trendmicro.deepsecurity.model.ApiKey;
 import com.trendmicro.deepsecurity.model.Computer;
 import com.trendmicro.deepsecurity.model.Computers;
+import com.trendmicro.deepsecurity.model.Expand;
 import com.trendmicro.deepsecurity.model.IntrusionPreventionComputerExtension;
 import com.trendmicro.deepsecurity.model.Policy;
 import com.trendmicro.deepsecurity.model.SearchCriteria;
@@ -114,10 +115,13 @@ public class TenantExamples {
 		ApiKeyAuth DefaultAuthentication = (ApiKeyAuth)tenantClient.getAuthentication("DefaultAuthentication");
 		DefaultAuthentication.setApiKey(key.getSecretKey());
 
+		// Include Intrusion Prevention information in the returned Computer objects
+		Expand expand = new Expand(Expand.OptionsEnum.INTRUSION_PREVENTION);
+		
 		// Get the computers and find the states
 		ComputersApi tnComputerApi = new ComputersApi(tenantClient);
 		Computers computers;
-		computers = tnComputerApi.listComputers(Boolean.FALSE, apiVersion);
+		computers = tnComputerApi.listComputers(expand.list(), Boolean.FALSE, apiVersion);
 
 		for (Computer computer : computers.getComputers()) {
 			computerIPStates.put(computer.getID(), computer.getIntrusionPrevention().getState());
@@ -190,9 +194,12 @@ public class TenantExamples {
 
 				// Create a ComputersApi object for the tenant
 				ComputersApi tnComputersApi = new ComputersApi();
+				
+				// Include Intrusion Prevention information in the returned Computer objects
+				Expand expand = new Expand(Expand.OptionsEnum.INTRUSION_PREVENTION);
 
 				// Iterate over the tenant computers
-				Computers tenantComputers = tnComputersApi.listComputers(Boolean.FALSE, apiVersion);
+				Computers tenantComputers = tnComputersApi.listComputers(expand.list(), Boolean.FALSE, apiVersion);
 				for (Computer tenantComputer : tenantComputers.getComputers()) {
 					IntrusionPreventionComputerExtension intrusionPeventionComputerExtension = tenantComputer.getIntrusionPrevention();
 					computerRules.put(tenantComputer.getID(), (ArrayList<Integer>)intrusionPeventionComputerExtension.getRuleIDs());

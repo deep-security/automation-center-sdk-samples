@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-/*
+/**
  * Creates a tenant.
  * @param {object} api The api module.
  * @param {String} accountName The account name to use for the tenant.
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the new tentant.
  */
-exports.createTenant = function(api, accountName, apiVersion) {
+exports.createTenant = function (api, accountName, apiVersion) {
   return new Promise((resolve, reject) => {
     // Tenant object
     const tenant = new api.Tenant();
@@ -66,14 +66,14 @@ exports.createTenant = function(api, accountName, apiVersion) {
   });
 };
 
-/*
+/**
  * Obtains the running state of the Intrusion Prevention module for a tenant's computers.
  * @param {object} api The api module.
  * @param {Number} tenantID The ID of the tenant.
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains computer IDs and the module running state.
  */
-exports.getIPStatesForTenant = function(api, tenantID, apiVersion) {
+exports.getIPStatesForTenant = function (api, tenantID, apiVersion) {
   return new Promise((resolve, reject) => {
     // Stores the Intrusion Prevention states
     const computerIPStates = [];
@@ -133,7 +133,7 @@ exports.getIPStatesForTenant = function(api, tenantID, apiVersion) {
   });
 };
 
-/*
+/**
  * Obtains the IDs of the Intrusion Prevention rules that are assigned to each tenant's computers.
  * Care must be taken to ensure that ApiClient uses the correct Api Key
  * when iterating tenants and calling asynchronous functions.
@@ -141,7 +141,7 @@ exports.getIPStatesForTenant = function(api, tenantID, apiVersion) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains, for each tenant, computer IDs and the rule IDs.
  */
-exports.getIpRulesForTenantComputers = function(api, apiVersion, secretKey) {
+exports.getIpRulesForTenantComputers = function (api, apiVersion, secretKey) {
   return new Promise((resolve, reject) => {
     let tenantRules, tenantKeys;
     const keyPromises = [];
@@ -161,9 +161,12 @@ exports.getIpRulesForTenantComputers = function(api, apiVersion, secretKey) {
     const searchFilter = new api.SearchFilter();
     searchFilter.searchCriteria = [searchCriteria];
 
-    // Search options
+    // Search options; Include Intrusion Prevention information in the returned Computer objects
+    const Options = api.Expand.OptionsEnum;
+    const expand = new api.Expand.Expand(Options.all);
     const searchOptions = {
       searchFilter: searchFilter,
+      expand: expand.list(),
       overrides: false
     };
 
@@ -223,7 +226,7 @@ function createKey(tenantID, api, apiVersion) {
   return new Promise((resolve, reject) => {
     // ApiKey properties
     const key = new api.ApiKey();
-    key.keyName = "Temporary sKey";
+    key.keyName = "Temporary Key" + Math.random().toString(36).substring(7);
     key.roleID = 1;
     key.locale = api.ApiKey.LocaleEnum["en-US"];
     key.timeZone = "Asia/Tokyo";
@@ -252,10 +255,18 @@ function getComputers(tenantKey, tenantID, api, apiVersion) {
     const DefaultAuthentication = tenantClient.authentications["DefaultAuthentication"];
     DefaultAuthentication.apiKey = tenantKey.secretKey;
 
+    // Include Intrusion Prevention information in the retrieved Computer objects
+    const Options = api.Expand.OptionsEnum;
+    const expand = new api.Expand.Expand(Options.intrusionPrevention);
+    const opts = {
+      expand: expand.list(),
+      overrides: false
+    };
+
     // Get the computers from the tenant
     const computersApi = new api.ComputersApi();
     computersApi
-      .listComputers(apiVersion, { overrides: "false" })
+      .listComputers(apiVersion, opts)
       .then(computers => {
         // Get the Intrusion Prevention rules for each computer
         for (let i = 0; i < computers.computers.length; i++) {
@@ -285,7 +296,7 @@ function deleteKey(tenantKey, api, apiVersion) {
   return apiKeysApi.deleteApiKey(tenantKey.ID, apiVersion);
 }
 
-/*
+/**
  * Adds a policy to a tenant.
  * @param {object} api The api module.
  * @param {Object} policy The policy to add to the tenant.
@@ -293,7 +304,7 @@ function deleteKey(tenantKey, api, apiVersion) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the new policy.
  */
-exports.addPolicyToTenant = function(api, policy, tenantID, apiVersion) {
+exports.addPolicyToTenant = function (api, policy, tenantID, apiVersion) {
   return new Promise((resolve, reject) => {
     // Creates an API key
     const createKey = () => {
