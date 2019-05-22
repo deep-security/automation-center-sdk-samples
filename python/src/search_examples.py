@@ -15,6 +15,7 @@
 
 import time
 
+
 def search_policies_by_name(api, configuration, api_version, api_exception, name):
     """ Searches for a policy by name.
 
@@ -101,13 +102,16 @@ def paged_search_computers(api, configuration, api_version, api_exception):
     search_filter.max_items = page_size
     search_filter.search_criteria = [search_criteria]
 
+    # Include the minimum information in the returned Computer objects
+    expand = api.Expand(api.Expand.none)
+
     # Perform the search and do work on the results
     computers_api = api.ComputersApi(api.ApiClient(configuration))
     paged_computers = []
 
     try:
         while True:
-            computers = computers_api.search_computers(api_version, search_filter=search_filter)
+            computers = computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
             num_found = len(computers.computers)
             current_paged_computers = []
 
@@ -161,10 +165,13 @@ def get_computers_with_policy_and_relay_list(api, configuration, api_version, ap
     # Create the search filter
     search_filter = api.SearchFilter(None, [policy_criteria, relay_criteria])
 
+    # Include the minimum information in the returned Computer objects
+    expand = api.Expand(api.Expand.none)
+
     try:
         # Perform the search
         computers_api = api.ComputersApi(api.ApiClient(configuration))
-        return computers_api.search_computers(api_version, search_filter=search_filter)
+        return computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
 
     except api_exception as e:
         return "Exception: " + str(e)

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-/*
+/**
  * Searches for a policy by name.
  * @param {object} api The api module.
  * @param {String} name The policy name to search for.
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the found poliicies.
  */
-exports.searchPoliciesByName = function(api, name, apiVersion) {
+exports.searchPoliciesByName = function (api, name, apiVersion) {
   return new Promise((resolve, reject) => {
     // Search criteria
     const searchCriteria = new api.SearchCriteria();
@@ -53,7 +53,7 @@ exports.searchPoliciesByName = function(api, name, apiVersion) {
   });
 };
 
-/*
+/**
  * Searches for computers that are assigned to a specific policy and relay list.
  * @param {object} api The api module.
  * @param {Number} relayListID The ID of the relay list.
@@ -61,7 +61,7 @@ exports.searchPoliciesByName = function(api, name, apiVersion) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the found computers.
  */
-exports.getComputersWithPolicyAndRelayList = function(api, relayListID, policyID, apiVersion) {
+exports.getComputersWithPolicyAndRelayList = function (api, relayListID, policyID, apiVersion) {
   // Search criteria for the platform
   const relayCriteria = new api.SearchCriteria();
   relayCriteria.fieldName = "relayListID";
@@ -79,8 +79,11 @@ exports.getComputersWithPolicyAndRelayList = function(api, relayListID, policyID
   searchFilter.searchCriteria = [relayCriteria, policyCriteria];
 
   // Add search filter to a search options object
+  const Options = api.Expand.OptionsEnum;
+  const expand = new api.Expand.Expand(Options.none);
   const searchOptions = {
     searchFilter: searchFilter,
+    expand: expand.list(),
     overrides: false
   };
 
@@ -89,14 +92,14 @@ exports.getComputersWithPolicyAndRelayList = function(api, relayListID, policyID
   return computersApi.searchComputers(apiVersion, searchOptions);
 };
 
-/*
+/**
  * Searches for Intrusion Prevention rules that have been updated within a specific number of days.
  * @param {object} api The api module.
  * @param {Number} numDays The number of days within which the rules were updated.
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the found rules.
  */
-exports.searchUpdatedIntrusionPreventionRules = function(api, numDays, apiVersion) {
+exports.searchUpdatedIntrusionPreventionRules = function (api, numDays, apiVersion) {
   // Time that rules were last updated
   const updateTime = Date.now() - numDays * 24 * 60 * 60 * 1000;
 
@@ -123,13 +126,13 @@ exports.searchUpdatedIntrusionPreventionRules = function(api, numDays, apiVersio
   return ipRulesApi.searchIntrusionPreventionRules(apiVersion, searchOptions);
 };
 
-/*
+/**
  * Searches for computers in pages of 10.
  * @param {object} api The api module.
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains an array of the pages of computers.
  */
-exports.pagedSearchComputers = function(api, apiVersion) {
+exports.pagedSearchComputers = function (api, apiVersion) {
   return new Promise((resolve, reject) => {
     const results = [];
     const pageSize = 10;
@@ -160,8 +163,11 @@ exports.pagedSearchComputers = function(api, apiVersion) {
         nextSearchFilter.searchCriteria = [nextSearchCriteria];
 
         // Add search filter to a search options object
+        const Options = api.Expand.OptionsEnum;
+        const expand = new api.Expand.Expand(Options.none);
         const nextSearchOpts = {
           searchFilter: nextSearchFilter,
+          expand: expand.list(),
           overrides: false
         };
         // Get the next page of computers
@@ -183,8 +189,11 @@ exports.pagedSearchComputers = function(api, apiVersion) {
     computerSearchFilter.searchCriteria = [searchCriteria];
 
     // Add search filter to a search options object
+    const Options = api.Expand.OptionsEnum;
+    const expand = new api.Expand.Expand(Options.none);
     const searchOpts = {
       searchFilter: computerSearchFilter,
+      expand: expand.list(),
       overrides: false
     };
 

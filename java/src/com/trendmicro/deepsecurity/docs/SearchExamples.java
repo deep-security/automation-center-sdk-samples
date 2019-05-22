@@ -29,6 +29,7 @@ import com.trendmicro.deepsecurity.model.Policy;
 import com.trendmicro.deepsecurity.model.SearchCriteria;
 import com.trendmicro.deepsecurity.model.Computer;
 import com.trendmicro.deepsecurity.model.Computers;
+import com.trendmicro.deepsecurity.model.Expand;
 import com.trendmicro.deepsecurity.model.SearchFilter;
 
 /**
@@ -118,6 +119,9 @@ public class SearchExamples {
 		SearchFilter searchFilter = new SearchFilter();
 		searchFilter.setMaxItems(pageSize);
 		searchFilter.addSearchCriteriaItem(searchCriteria);
+		
+		// Include the minimum information in returned Computer objects
+		Expand expand = new Expand(Expand.OptionsEnum.NONE);
 
 		ComputersApi computersApi = new ComputersApi();
 
@@ -125,7 +129,7 @@ public class SearchExamples {
 		int found;
 		do {
 			// Find a page of computers and save the number found
-			Computers computers = computersApi.searchComputers(searchFilter, Boolean.FALSE, apiVersion);
+			Computers computers = computersApi.searchComputers(searchFilter, expand.list(), Boolean.FALSE, apiVersion);
 
 			found = computers.getComputers().size();
 			if (found > 0) {
@@ -170,9 +174,12 @@ public class SearchExamples {
 		SearchFilter searchFilter = new SearchFilter();
 		searchFilter.addSearchCriteriaItem(relayCrit);
 		searchFilter.addSearchCriteriaItem(policyCrit);
+		
+		// Include the minimum information in returned Computer objects
+		Expand expand = new Expand(Expand.OptionsEnum.NONE);
 
 		// Perform the search
 		ComputersApi computersApi = new ComputersApi();
-		return computersApi.searchComputers(searchFilter, Boolean.FALSE, apiVersion);
+		return computersApi.searchComputers(searchFilter, expand.list(), Boolean.FALSE, apiVersion);
 	}
 }

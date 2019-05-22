@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 
+
 def check_anti_malware(api, configuration, api_version, api_exception, computer_id):
     """ Obtains certain anti-malware properties for a computer.
 
@@ -24,21 +25,23 @@ def check_anti_malware(api, configuration, api_version, api_exception, computer_
     :return: An AntiMalwareConfigurationsApi object that contains the anti-malware properties of the computer.
     """
 
+    # Include Anti-Malware information in the returned Computer object
+    expand = api.Expand(api.Expand.anti_malware, api.Expand.computer_settings)
+
     # Get the computer object from Deep Security Manager
     computers_api = api.ComputersApi(api.ApiClient(configuration))
-    computer = computers_api.describe_computer(computer_id, api_version)
+    computer = computers_api.describe_computer(computer_id, api_version, expand=expand.list(), overrides=False)
 
-    # Get the anti-malware scan configuration id for the computer
+    # Get the Anti-Malware scan configuration id for the computer
     real_time_scan_configuration_id = computer.anti_malware.real_time_scan_configuration_id
 
     try:
-        # Get the anti-malware properties for the computer
+        # Get the Anti-Malware properties for the computer
         am_configs_api = api.AntiMalwareConfigurationsApi(api.ApiClient(configuration))
         return am_configs_api.describe_anti_malware(real_time_scan_configuration_id, api_version)
 
     except api_exception as e:
         return "Exception: " + str(e)
-
 
 
 def find_rules_for_cve(api, configuration, api_version, api_exception, cve_id):
@@ -92,10 +95,13 @@ def check_computers_for_ip_rule(api, configuration, api_version, api_exception, 
 
     unprotected_computers = []
 
+    # Include Intrusion Prevention information in the returned Computer objects
+    expand = api.Expand(api.Expand.intrusion_prevention)
+
     try:
         # Create a list of computers
         computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers_list = computers_api.list_computers(api_version, overrides=False)
+        computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
         # Search the list of computers for those that do not have the IP rule
         for computer in computers_list.computers:
@@ -108,6 +114,7 @@ def check_computers_for_ip_rule(api, configuration, api_version, api_exception, 
     except api_exception as e:
         return "Exception: " + str(e)
 
+
 def apply_rule_to_policies(api, configuration, api_version, api_exception, computers, rule_id):
     """ Adds an Intrusion Prevention rule to the policies of a list of computers.
 
@@ -115,11 +122,10 @@ def apply_rule_to_policies(api, configuration, api_version, api_exception, compu
     :param configuration: Configuration object to pass to the api client.
     :param api_version: The version of the API to use.
     :param api_exception: The Deep Security API exception module.
-    :param computer: The Computer that is assigned the policy.
+    :param computers: The Computer that is assigned the policy.
     :param rule_id: The ID of the Intrusion Prevention rule to add.
     :return: A list of PoliciesApi objects that were updated with the rule.
     """
-
 
     # Store IDs of policies to modify
     policy_ids = []
@@ -137,12 +143,11 @@ def apply_rule_to_policies(api, configuration, api_version, api_exception, compu
             current_rules = policies_api.describe_policy(policy_id, api_version, overrides=False)
 
             # Add the rule_id if it doesn't already exist in current_rules
-            if current_rules.intrusion_prevention.rule_ids == None:
+            if current_rules.intrusion_prevention.rule_ids is None:
                 current_rules.intrusion_prevention.rule_ids = rule_id
 
             elif rule_id not in current_rules.intrusion_prevention.rule_ids:
                 current_rules.intrusion_prevention.rule_ids.append(rule_id)
-
 
             # Add the new and existing intrusion prevention rules to a policy
             intrusion_prevention_policy_extension = api.IntrusionPreventionPolicyExtension()
@@ -185,7 +190,6 @@ def get_intrusion_prevention_recommendations(api, configuration, api_version, ap
         return "Exception: " + str(e)
 
 
-
 def get_computer_statuses(api, configuration, api_version, api_exception):
     """Obtains agent and appliance status for all computers and provides the results as comma-separated values.
 
@@ -199,15 +203,19 @@ def get_computer_statuses(api, configuration, api_version, api_exception):
     # Add column titles to comma-separated values string
     csv = "Host Name,Agent or Appliance,Status,Status Messages,Tasks\r\n"
 
+    # Include computer status information in the returned Computer objects
+    expand = api.Expand(api.Expand.intrusion_prevention)
+
     try:
+        # Get all computers
         computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers = computers_api.list_computers(api_version, overrides=False)
+        computers = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
         for computer in computers.computers:
             computer_info = []
 
             # Report on computers with no agent or appliance
-            if computer.agent_finger_print == None and computer.appliance_finger_print == None:
+            if computer.agent_finger_print is None and computer.appliance_finger_print is None:
                 # Hostname and protection type
                 computer_info.append(computer.host_name)
                 computer_info.append("None")
@@ -215,7 +223,7 @@ def get_computer_statuses(api, configuration, api_version, api_exception):
                 # Agent/appliance status and status messages
                 computer_info.append("No agent/appliance")
                 status_messages = ""
-                if computer.computer_status != None and computer.computer_status.agent_status != None:
+                if computer.computer_status is not None and computer.computer_status.agent_status is not None:
                     status_messages = str(computer.computer_status.agent_status_messages)
                 computer_info.append(status_messages)
 
@@ -235,23 +243,23 @@ def get_computer_statuses(api, configuration, api_version, api_exception):
                 appliance_status = computer.computer_status.appliance_status
 
                 # Agent is installed but is not active
-                if computer.agent_finger_print != None and agent_status != "active":
+                if computer.agent_finger_print is not None and agent_status != "active":
                     # Hostname and protection type
                     computer_info.append(computer.host_name)
                     computer_info.append("Agent")
 
                     # Agent status, status messages, and tasks
-                    if computer.computer_status.agent_status != None:
+                    if computer.computer_status.agent_status is not None:
                         computer_info.append(computer.computer_status.agent_status)
                     else:
                         computer_info.append("")
 
-                    if computer.computer_status.agent_status_messages != None:
+                    if computer.computer_status.agent_status_messages is not None:
                         computer_info.append(str(computer.computer_status.agent_status_messages))
                     else:
                         computer_info.append("")
 
-                    if computer.tasks != None:
+                    if computer.tasks is not None:
                         computer_info.append(str(computer.tasks.agent_tasks))
                     else:
                         computer_info.append("")
@@ -267,23 +275,23 @@ def get_computer_statuses(api, configuration, api_version, api_exception):
                     csv += csv_line
 
                 # Appliance is installed but is not active
-                if computer.appliance_finger_print != None and appliance_status != "active":
+                if computer.appliance_finger_print is not None and appliance_status != "active":
                     # Hostname and protection type
                     computer_info.append(computer.host_name)
                     computer_info.append("Appliance")
 
                     # Appliance status, status messages, and tasks
-                    if computer.computer_status.appliance_status != None:
+                    if computer.computer_status.appliance_status is not None:
                         computer_info.append(computer.computer_status.appliance_status)
                     else:
                         computer_info.append("")
 
-                    if computer.computer_status.appliance_status_messages != None:
+                    if computer.computer_status.appliance_status_messages is not None:
                         computer_info.append(str(computer.computer_status.appliance_status_messages))
                     else:
                         computer_info.append("")
 
-                    if computer.tasks != None:
+                    if computer.tasks is not None:
                         computer_info.append(str(computer.tasks.appliance_tasks))
                     else:
                         computer_info.append("")
@@ -304,7 +312,6 @@ def get_computer_statuses(api, configuration, api_version, api_exception):
         return "Exception: " + str(e)
 
 
-
 def get_anti_malware_status_for_computers(api, configuration, api_version, api_exception):
     """Obtains agent and appliance status for the Anti-Malware module of all computers.
 
@@ -321,9 +328,12 @@ def get_anti_malware_status_for_computers(api, configuration, api_version, api_e
     # Add column titles to comma-separated values string
     csv = "Host Name,Module State,Agent or Appliance,Status,Status Message\r\n"
 
+    # Include Anti-Malware information in the returned Computer objects
+    expand = api.Expand(api.Expand.anti_malware)
+
     try:
         computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers = computers_api.list_computers(api_version, overrides=False)
+        computers = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
         # Get the list of computers and iterate over it
         for computer in computers.computers:

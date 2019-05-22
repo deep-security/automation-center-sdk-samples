@@ -17,27 +17,7 @@ import deepsecurity as api
 from deepsecurity.rest import ApiException as api_exception
 import urllib3
 import os
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-# Get the DSM URL and API key from a JSON file
 import json
-
-property_file = os.path.dirname(os.path.abspath(__file__)) + '/properties.json'
-
-with open(property_file) as raw_properties:
-    properties = json.load(raw_properties)
-
-secret_key = properties['secretkey']
-url = properties['url']
-
-
-# Add DSM host information to the API client configuration
-configuration = api.Configuration()
-configuration.host = url
-configuration.api_key['api-secret-key'] = secret_key
-
-api_version = 'v1'
 
 # Import code example files for testing
 import anti_malware_examples
@@ -61,6 +41,24 @@ import computer_override_examples
 import scheduled_task_examples
 import role_examples
 import rate_limit_examples
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Get the DSM URL and API key from a JSON file
+property_file = os.path.dirname(os.path.abspath(__file__)) + '/properties.json'
+
+with open(property_file) as raw_properties:
+    properties = json.load(raw_properties)
+
+secret_key = properties['secretkey']
+url = properties['url']
+
+# Add DSM host information to the API client configuration
+configuration = api.Configuration()
+configuration.host = url
+configuration.api_key['api-secret-key'] = secret_key
+
+api_version = 'v1'
 
 # Values for use in examples
 
@@ -114,7 +112,7 @@ relay_list_id = 1
 name = "API Policy"
 
 # computer_id_status_change, rule_id, rule_id_2 & cve_id for Computer Status examples
-computer_id_status_change = 36
+computer_id_status_change = 2
 rule_id = 6104
 rule_id_2 = 5930
 cve_id = "CVE-2016-7214"
@@ -143,7 +141,9 @@ new_policy.parent_id = 1
 settings_policy_id = 9
 
 # For Computer Overrides examples
-override_computer_id = 3
+override_computer_id = 2
+expand = api.Expand()
+expand.add(expand.intrusion_prevention)
 
 # For Scheduled Tasks examples
 custom_interval = 2
@@ -221,7 +221,7 @@ def main():
     print(
         "Displaying results from computer_override_examples.get_computer_overrides:\n" +
         str(computer_override_examples.get_computer_overrides(
-            api, configuration, api_version, api_exception, override_computer_id))
+            api, configuration, api_version, api_exception, override_computer_id, expand))
     )
 
     # Settings examples
@@ -418,8 +418,7 @@ def main():
 
     print(
         "Displaying results from computer_status_examples.get_computer_statuses:\n" +
-        str(computer_status_examples.get_computer_statuses(
-            api, configuration, api_version, api_exception))
+        str(computer_status_examples.get_computer_statuses(api, configuration, api_version, api_exception))
     )
 
     print(

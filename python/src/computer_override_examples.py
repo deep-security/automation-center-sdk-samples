@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 
+
 def override_reconnaissance_scan(api, configuration, api_version, api_exception, computer_id):
     """ Overrides a computer to enable Firewall reconnaissance scan.
 
@@ -36,7 +37,6 @@ def override_reconnaissance_scan(api, configuration, api_version, api_exception,
     computer = api.Computer()
     computer.computer_settings = computer_settings
 
-
     try:
         # Apply the override to the computer
         computers_api = api.ComputersApi(api.ApiClient(configuration))
@@ -47,7 +47,7 @@ def override_reconnaissance_scan(api, configuration, api_version, api_exception,
         return "Exception: " + str(e)
 
 
-def get_computer_overrides(api, configuration, api_version, api_exception, computer_id):
+def get_computer_overrides(api, configuration, api_version, api_exception, computer_id, expand):
     """ Gets a Computer object that contains only overrides.
 
     :param api: The Deep Security API modules.
@@ -55,14 +55,16 @@ def get_computer_overrides(api, configuration, api_version, api_exception, compu
     :param api_version: The version of the API to use.
     :param api_exception: The Deep Security API exception module.
     :param computer_id: The ID of the computer.
+    :param expand: The information to include in the returned Computer object
     :return: A Computer object that contains only overrides.
     """
 
     try:
+        #
         # Get the Computer object with overrides set to True
         computers_api = api.ComputersApi(api.ApiClient(configuration))
 
-        return computers_api.describe_computer(computer_id, api_version, overrides=True)
+        return computers_api.describe_computer(computer_id, api_version, expand=expand.list(), overrides=True)
 
     except api_exception as e:
         return "Exception: " + str(e)

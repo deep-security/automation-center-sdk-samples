@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import random
+import string
+
 
 def create_tenant(api, configuration, api_version, api_exception, account_name):
     """ Creates a tenant on the primary Deep Security Manager.
@@ -70,7 +73,7 @@ def get_ip_states_for_tenant(api, configuration, api_version, api_exception, ten
 
     # Create an API key
     key = api.ApiKey()
-    key.key_name = "Temporary Key for getting IP states from tenant computers"
+    key.key_name = "Temporary API Key"
     key.role_id = 1
     key.locale = "en-US"
     key.time_zone = "Asia/Tokyo"
@@ -91,9 +94,12 @@ def get_ip_states_for_tenant(api, configuration, api_version, api_exception, ten
         # Add the secret key to the configuration
         configuration.api_key['api-secret-key'] = generated_key.secret_key
 
+        # Include Intrusion Prevention information in the returned Computer objects
+        expand = api.Expand(api.Expand.intrusion_prevention)
+
         # Get a list of tenant computers
         computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers_list = computers_api.list_computers(api_version)
+        computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
         # Find the Intrusion Prevention state for each computer
         computer_ip_states = {}
@@ -139,7 +145,7 @@ def get_ip_rules_for_tenant_computers(api, configuration, api_version, api_excep
 
                 # Create an API key
                 key = api.ApiKey()
-                key.key_name = "Temporary Key for getting IP rules from tenant computers"
+                key.key_name = "Temporary Key for getting IP rules from tenant computers" + "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
                 key.role_id = 1
                 key.locale = "en-US"
                 key.time_zone = "Asia/Tokyo"
@@ -171,7 +177,6 @@ def get_ip_rules_for_tenant_computers(api, configuration, api_version, api_excep
                 configuration.api_key['api-secret-key'] = primary_key
 
         return tenant_rules
-
 
     except api_exception as e:
         return "Exception: " + str(e)
@@ -214,9 +219,12 @@ def get_tenant_rules(api, configuration, api_version, api_exception, tenant_id):
         # Add the secret key to the configuration
         configuration.api_key['api-secret-key'] = generated_key.secret_key
 
+        # Include Intrusion Prevention information in the retrieved Computer objects
+        expand = api.Expand(api.Expand.intrusion_prevention)
+
         # Get a list of tenant computers
         computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers_list = computers_api.list_computers(api_version)
+        computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
         # Find the Intrusion Prevention rule IDs for each computer
         rule_ids = {}
