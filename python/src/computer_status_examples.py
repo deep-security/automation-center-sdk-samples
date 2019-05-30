@@ -204,7 +204,7 @@ def get_computer_statuses(api, configuration, api_version, api_exception):
     csv = "Host Name,Agent or Appliance,Status,Status Messages,Tasks\r\n"
 
     # Include computer status information in the returned Computer objects
-    expand = api.Expand(api.Expand.intrusion_prevention)
+    expand = api.Expand(api.Expand.computer_status)
 
     try:
         # Get all computers
