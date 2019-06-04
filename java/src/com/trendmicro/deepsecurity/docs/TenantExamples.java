@@ -83,7 +83,11 @@ public class TenantExamples {
 
 		// Add the tenant to the manager
 		TenantsApi tenantsApi = new TenantsApi();
-		return tenantsApi.createTenant(tenant, Boolean.TRUE, Boolean.FALSE, Boolean.TRUE, apiVersion);
+		Boolean confirmationRequired = Boolean.FALSE;
+		Boolean bypassTenantCache = Boolean.TRUE;
+		Boolean asynchronous = Boolean.TRUE;
+		
+		return tenantsApi.createTenant(tenant, bypassTenantCache, confirmationRequired, asynchronous, apiVersion);
 	}
 
 	/**
