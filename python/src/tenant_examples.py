@@ -52,7 +52,7 @@ def create_tenant(api, configuration, api_version, api_exception, account_name):
     # Create the tenant on Deep Security Manager
     try:
         tenants_api = api.TenantsApi(api.ApiClient(configuration))
-        return tenants_api.create_tenant(tenant, api_version, confirmation_required=False)
+        return tenants_api.create_tenant(tenant, api_version, confirmation_required=False, asynchronous=True)
 
     except api_exception as e:
         return "Exception: " + str(e)
