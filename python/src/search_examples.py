@@ -24,7 +24,7 @@ def search_policies_by_name(api, configuration, api_version, api_exception, name
     :param api_version: The version of the API to use.
     :param api_exception: The Deep Security API exception module.
     :param name: The policy name to search for.
-    :return: A PoliciesApi object that contains the policies found by the search.
+    :return: A Policies object that contains the policies found by the search.
     """
 
     # Set search criteria
@@ -54,7 +54,7 @@ def search_updated_intrusion_prevention_rules(api, configuration, api_version, a
     :param api_version: The version of the API to use.
     :param api_exception: The Deep Security API exception module.
     :param num_days: The number of days within which the rules were updated.
-    :return: A IntrusionPreventionRulesApi object that contains the rules that were updated within num_days.
+    :return: A IntrusionPreventionRules object that contains the rules that were updated within num_days.
     """
 
     # Time that rules were last updated
@@ -147,7 +147,7 @@ def get_computers_with_policy_and_relay_list(api, configuration, api_version, ap
     :param api_exception: The Deep Security API exception module.
     :param relay_list_id: The ID of the relay list.
     :param policy_id: The ID of the policy.
-    :return: A ComputersApi object that contains matching computers
+    :return: A Computers object that contains matching computers
     """
 
     # Set search criteria for platform
@@ -176,3 +176,35 @@ def get_computers_with_policy_and_relay_list(api, configuration, api_version, ap
     except api_exception as e:
         return "Exception: " + str(e)
 
+
+def search_computers_by_aws_account(api, configuration, api_version, api_exception, account_id):
+    """ Search for protected EC2 instances that belong to a specific AWS account.
+
+    :param api: The Deep Security API modules.
+    :param configuration: Configuration object to pass to the api client.
+    :param api_version: The version of the API to use.
+    :param api_exception: The Deep Security API exception module.
+    :param account_id: The ID of the AWS account.
+    :return: A Computers object that contains matching computers
+    """
+
+    # Search criteria
+    computer_criteria = api.SearchCriteria()
+    computer_criteria.field_name = "ec2VirtualMachineSummary/accountID"
+    computer_criteria.string_test = "equal"
+    computer_criteria.string_value = account_id
+
+    # Search filter
+    max_items = None
+    search_filter = api.SearchFilter(max_items, computer_criteria)
+
+    # Include only the EC2 virtual machine summary in the returned computers
+    expand = api.Expand(api.Expand.ec2_virtual_machine_summary)
+
+    try:
+        # Perform the search
+        computers_api = api.ComputersApi(api.ApiClient(configuration))
+        return computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
+
+    except api_exception as e:
+        return "Exception: " + str(e)

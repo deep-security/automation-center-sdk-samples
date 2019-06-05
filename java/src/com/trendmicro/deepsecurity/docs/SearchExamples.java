@@ -182,4 +182,31 @@ public class SearchExamples {
 		ComputersApi computersApi = new ComputersApi();
 		return computersApi.searchComputers(searchFilter, expand.list(), Boolean.FALSE, apiVersion);
 	}
+	
+	/**
+	 * Search for protected EC2 instances that belong to a specific AWS account.
+	 * 
+	 * @param accountID The ID of the AWS account.
+	 * @param apiVersion The version of the API to use.
+	 * @throws ApiException if a problem occurs when searching.
+	 * @returns A Computers object that contains matching computers.
+	 */
+	public static Computers searchComputersByAwsAccount(String accountID, String apiVersion) throws ApiException {
+		// Search criteria for the account ID
+		SearchCriteria computerCriteria = new SearchCriteria();
+		computerCriteria.setFieldName("ec2VirtualMachineSummary/accountID");
+		computerCriteria.setStringValue(accountID);
+		computerCriteria.setStringTest(SearchCriteria.StringTestEnum.EQUAL);
+
+		// Search filter
+		SearchFilter searchFilter = new SearchFilter();
+		searchFilter.addSearchCriteriaItem(computerCriteria);
+		
+		// Include only ec2VirtualMachineSummary in the returned computer objects 
+		Expand expand = new Expand();
+		expand.add(Expand.OptionsEnum.EC2_VIRTUAL_MACHINE_SUMMARY);
+		
+		ComputersApi computersApi = new ComputersApi();
+		return computersApi.searchComputers(searchFilter, expand.list(), Boolean.FALSE, apiVersion);
+	}
 }
