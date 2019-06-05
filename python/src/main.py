@@ -383,6 +383,12 @@ def main():
             api, configuration, api_version, api_exception, relay_list_id, policy_id))
     )
 
+    print(
+        "Displaying results from search_examples.search_computers_by_aws_account:\n" +
+        str(search_examples.search_computers_by_aws_account(
+            api, configuration, api_version, api_exception, "my aws account ID"))
+    )
+
     # Computer Status examples
     print(
         "Displaying results from computer_status_examples.check_anti_malware:\n" +

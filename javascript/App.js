@@ -471,10 +471,10 @@ SettingsExamples.setNetworkEngineModeToInline(api, policyID, apiVersion)
     console.log(`Error setting Network Engine Mode: ${error}`);
   });
 */
-/*
+
 // ### Search Examples ###
 const SearchExamples = require("./lib/SearchExamples.js");
-
+/*
 let policyName = "Base Policy";
 SearchExamples.searchPoliciesByName(api, policyName, apiVersion)
   .then(searchResults => {
@@ -512,6 +512,14 @@ SearchExamples.pagedSearchComputers(api, apiVersion)
   })
   .catch(error => {
     console.log(`Error searching computers in pages: ${error}`);
+  });
+
+SearchExamples.searchComputersByAwsAccount(api, "my AWS account ID", apiVersion)
+  .then(searchResults => {
+    console.log(`Found ${searchResults.computers.length} computers.`);
+  })
+  .catch(error => {
+    console.log(`Error searching Computers by AWS account: ${error}`);
   });
 */
 /*

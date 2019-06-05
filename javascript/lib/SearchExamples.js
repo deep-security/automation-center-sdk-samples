@@ -21,7 +21,7 @@
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the found poliicies.
  */
-exports.searchPoliciesByName = function (api, name, apiVersion) {
+exports.searchPoliciesByName = function(api, name, apiVersion) {
   return new Promise((resolve, reject) => {
     // Search criteria
     const searchCriteria = new api.SearchCriteria();
@@ -61,7 +61,7 @@ exports.searchPoliciesByName = function (api, name, apiVersion) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the found computers.
  */
-exports.getComputersWithPolicyAndRelayList = function (api, relayListID, policyID, apiVersion) {
+exports.getComputersWithPolicyAndRelayList = function(api, relayListID, policyID, apiVersion) {
   // Search criteria for the platform
   const relayCriteria = new api.SearchCriteria();
   relayCriteria.fieldName = "relayListID";
@@ -99,7 +99,7 @@ exports.getComputersWithPolicyAndRelayList = function (api, relayListID, policyI
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the found rules.
  */
-exports.searchUpdatedIntrusionPreventionRules = function (api, numDays, apiVersion) {
+exports.searchUpdatedIntrusionPreventionRules = function(api, numDays, apiVersion) {
   // Time that rules were last updated
   const updateTime = Date.now() - numDays * 24 * 60 * 60 * 1000;
 
@@ -132,7 +132,7 @@ exports.searchUpdatedIntrusionPreventionRules = function (api, numDays, apiVersi
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains an array of the pages of computers.
  */
-exports.pagedSearchComputers = function (api, apiVersion) {
+exports.pagedSearchComputers = function(api, apiVersion) {
   return new Promise((resolve, reject) => {
     const results = [];
     const pageSize = 10;
@@ -206,4 +206,37 @@ exports.pagedSearchComputers = function (api, apiVersion) {
         reject(error);
       });
   });
+};
+
+/**
+ * Searches for protected EC2 instances that belong to a specific AWS account.
+ * @param {object} api The api module.
+ * @param {String} accountID The ID of the AWS account.
+ * @param {String} apiVersion The api version to use.
+ * @return {Promise} A promise that contains the found computers.
+ */
+exports.searchComputersByAwsAccount = function(api, accountID, apiVersion) {
+  // Search criteria
+  const searchCriteria = new api.SearchCriteria();
+  searchCriteria.fieldName = "ec2VirtualMachineSummary/accountID";
+  searchCriteria.stringTest = api.SearchCriteria.StringTestEnum.equal;
+  searchCriteria.stringValue = accountID;
+
+  // Add criteria to search filter
+  const searchFilter = new api.SearchFilter();
+  searchFilter.searchCriteria = [searchCriteria];
+
+  // Include only the EC2 virtual machine summary in the returned computers
+  const expand = new api.Expand.Expand(api.Expand.OptionsEnum.ec2VirtualMachineSummary);
+
+  // Search options object
+  const searchOptions = {
+    searchFilter: searchFilter,
+    expand: expand.list(),
+    overrides: false
+  };
+
+  // Perform the search
+  const computersApi = new api.ComputersApi();
+  return computersApi.searchComputers(apiVersion, searchOptions);
 };
