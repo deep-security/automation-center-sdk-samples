@@ -21,27 +21,16 @@
  * @param {String} apiVersion The API version to use.
  * @returns {Promise} A promise object that resolves to the computer settings object.
  */
-exports.overrideReconnaissanceScan = function (api, computerID, apiVersion) {
-  return new Promise((resolve, reject) => {
-    const settingValue = new api.SettingValue();
-    settingValue.value = "false";
+exports.overrideReconnaissanceScan = function(api, computerID, apiVersion) {
+  // Setting name
+  const settingName = "firewallSettingReconnaissanceEnabled";
 
-    let computerSettings = new api.ComputerSettings();
-    computerSettings.firewallSettingReconnaissanceEnabled = settingValue;
+  // Setting value
+  const settingValue = new api.SettingValue();
+  settingValue.value = "true";
 
-    let computer = new api.Computer();
-    computer.computerSettings = computerSettings;
-
-    let computersApi = new api.ComputersApi();
-    computersApi
-      .modifyComputer(computerID, computer, apiVersion, { overrides: true })
-      .then(modifiedComputer => {
-        resolve(modifiedComputer.computerSettings);
-      })
-      .catch(error => {
-        reject(error);
-      });
-  });
+  let computersApi = new api.ComputersApi();
+  return computersApi.modifyComputerSetting(computerID, settingName, settingValue, apiVersion, { overrides: true });
 };
 
 /**
@@ -52,7 +41,7 @@ exports.overrideReconnaissanceScan = function (api, computerID, apiVersion) {
  * @param {String} apiVersion The API version to use.
  * @returns {Promise} A promise object that resolves to the computer ID
  */
-exports.getComputerOverrides = function (api, expand, computerID, apiVersion) {
+exports.getComputerOverrides = function(api, expand, computerID, apiVersion) {
   const computersApi = new api.ComputersApi();
   const opts = {
     overrides: true,

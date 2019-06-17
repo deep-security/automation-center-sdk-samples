@@ -162,14 +162,28 @@ ScheduledTaskExamples.createDiscoverComputersScheduledTask(api, apiVersion)
 // ### Automated Deployment Examples ###
 const AutomateDeploymentExamples = require("./lib/AutomateDeploymentExamples.js");
 
-AutomateDeploymentExamples.configureSystemSettings(api, apiVersion)
+const maxSessions = 100;
+const exceedAction = "Block new sessions";
+AutomateDeploymentExamples.configureMaxSessions(api, apiVersion, maxSessions, exceedAction)
   .then(systemSettings => {
     console.log(
-      `New value for platformSettingActiveSessionsMax: ${systemSettings.platformSettingActiveSessionsMax.value}`
+      `New value for platformSettingActiveSessionsMax: ${systemSettings.platformSettingActiveSessionsMax.value}\n` +
+        `New value for platformSettingActiveSessionsMaxExceededAction: ${
+          systemSettings.platformSettingActiveSessionsMaxExceededAction.value
+        }`
     );
   })
   .catch(error => {
     console.log(`Error setting system setting: ${error}`);
+  });
+
+const allowAgentActivation = 0;
+AutomateDeploymentExamples.setAgentInitiatedActionEnabled(api, apiVersion, allowAgentActivation)
+  .then(settingValue => {
+    console.log(`New value for agentInitiatedActionEnabled: ${settingValue.value}`);
+  })
+  .catch(error => {
+    console.log(`Error setting a system setting: ${error}`);
   });
 
 AutomateDeploymentExamples.addComputer("testcomputer", api, apiVersion)
@@ -426,11 +440,9 @@ ComputerStatusExamples.getComputerStatuses(api, apiVersion)
 const ComputerOverrideExamples = require("./lib/ComputerOverrideExamples.js");
 
 ComputerOverrideExamples.overrideReconnaissanceScan(api, computerID, apiVersion)
-  .then(returnedSettings => {
+  .then(returnedSettingValue => {
     console.log(
-      `ComputerSettings.firewallSettingReconnaissanceEnabled: ${
-        returnedSettings.firewallSettingReconnaissanceEnabled.value
-      }`
+      `ComputerSettings.firewallSettingReconnaissanceEnabled: ${returnedSettingValue.value}`
     );
   })
   .catch(error => {
@@ -456,8 +468,8 @@ ComputerOverrideExamples.getComputerOverrides(api, expand, computerID, apiVersio
 const SettingsExamples = require("./lib/SettingsExamples.js");
 
 SettingsExamples.getNetworkEngineMode(api, policyID, apiVersion)
-  .then(networkEngineModeValue => {
-    console.log(`Network Engine Mode value: ${networkEngineModeValue}`);
+  .then(networkEngineModeSetting => {
+    console.log(`Network Engine Mode value: ${networkEngineModeSetting.value}`);
   })
   .catch(error => {
     console.log(`Error getting Network Engine Mode value:${error}`);
@@ -470,8 +482,23 @@ SettingsExamples.setNetworkEngineModeToInline(api, policyID, apiVersion)
   .catch(error => {
     console.log(`Error setting Network Engine Mode: ${error}`);
   });
-*/
 
+const failOpen = true;
+SettingsExamples.setFirewallFailOpenBehavior(api, policyID, failOpen, apiVersion)
+  .then(returnedPolicySettings => {
+    console.log(
+      `Changed failureResponseEngineSystem to ${
+        returnedPolicySettings.firewallSettingFailureResponseEngineSystem.value
+      }\n` +
+        `Changed failureResponsePacketSanityCheck to ${
+          returnedPolicySettings.firewallSettingFailureResponsePacketSanityCheck.value
+        }`
+    );
+  })
+  .catch(error => {
+    console.log(`Error setting fail open behavior: ${error}`);
+  });
+*/
 // ### Search Examples ###
 const SearchExamples = require("./lib/SearchExamples.js");
 /*

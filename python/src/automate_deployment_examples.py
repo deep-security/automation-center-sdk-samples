@@ -14,24 +14,31 @@
 #
 
 
-def configure_system_settings(api, configuration, api_version, api_exception):
-    """ Configures the maximum number of active sessions. Demonstrates how to
-    configure system properties.
+def configure_max_sessions(api, configuration, api_version, api_exception, max_allowed, action):
+    """ Configures the maximum number of active sessions allowed for users, and the action to take when the maximum is exceeded.
+    Demonstrates how to configure multiple system properties.
 
     :param api: The Deep Security API modules.
     :param configuration: Configuration object to pass to the api client.
     :param api_version: The version of the API to use.
     :param api_exception: The Deep Security API exception module.
-    :return: A SystemSettingsApi object that contains the ID of the updated system settings.
+    :param max_allowed: The number of maximum sessions allowed.
+    :param action: The action to take when the max sessions is exceeded. Valid values are "Block new sessions" and "Expire oldest session".
+    :return: A SettingValue object that contains the ID of the updated system settings.
     """
 
     # Create the SettingValue object and set the max sessions value
     max_sessions = api.SettingValue()
-    max_sessions.value = "100"
+    max_sessions.value = str(max_allowed)
 
     # Add the SettingValue object to a SystemSettings object
     system_settings = api.SystemSettings()
     system_settings.platform_setting_active_sessions_max_num = max_sessions
+
+    # Repeat for the platform_setting_active_sessions_max_exceeded_action
+    exceed_action = api.SettingValue()
+    exceed_action.value = action
+    system_settings.platform_setting_active_sessions_max_exceeded_action = exceed_action
 
     try:
         # Modify system settings on Deep Security Manager
@@ -40,6 +47,31 @@ def configure_system_settings(api, configuration, api_version, api_exception):
 
     except api_exception as e:
         return "Exception: " + str(e)
+
+
+def set_allow_agent_initiated_activation(api, configuration, api_version, api_exception, allow):
+    """ Configures whether agent-initiated activation is allowed. Demonstrates how to set a single system property.
+    
+    :param api: The Deep Security API modules.
+    :param configuration: Configuration object to pass to the api client.
+    :param api_version: The version of the API to use.
+    :param api_exception: The Deep Security API exception module.
+    :param allow: The value for the system setting.
+    :return: A SettingValue object that contains the value of the updated setting.
+    """
+
+    # Create the setting value
+    allow_value = api.SettingValue()
+    allow_value.value = str(allow)
+
+    try:
+        # Modify system setting on Deep Security Manager
+        system_settings_api = api.SystemSettingsApi(api.ApiClient(configuration))
+        return system_settings_api.modify_system_setting(api.SystemSettings.platform_setting_agent_initiated_activation_enabled, allow_value, api_version)
+
+    except api_exception as e:
+        return "Exception: " + str(e)
+
 
 def add_computer (api, configuration, api_version, api_exception, hostname):
     """ Adds a computer to Deep Security Manager.
