@@ -15,24 +15,50 @@
  */
 
 /**
- * Configures the maximum number of active sessions.
- * Demonstrates how to configure system properties.
+ * Configures the maximum number of active sessions allowed for users, and the action to take when the maximum is exceeded.
+ * Demonstrates how to configure multiple system properties.
  * @param {object} api The api module.
  * @param {String} apiVersion The api version to use.
+ * @param {number} maxValue The maximum number of sessions to allow.
+ * @param {String} action The action to take when a user exceeds the maximum allowed sessions. Valid values are "Block new sessions" and "Expire oldest session".
  * @returns {Promise} The promise that SystemSettingsApi.modifySystemSettings returns.
  */
-exports.configureSystemSettings = function(api, apiVersion) {
+exports.configureMaxSessions = function(api, apiVersion, maxValue, action) {
   // Create the settings value
   const maxSessions = new api.SettingValue();
-  maxSessions.value = "20";
+  maxSessions.value = maxValue;
 
   // Create a SystemSettings object and set the setting value
   const systemSettings = new api.SystemSettings();
   systemSettings.platformSettingActiveSessionsMax = maxSessions;
 
+  // Repeat for platformSettingActiveSessionsMaxExceededAction
+  const exceedAction = new api.SettingValue();
+  exceedAction.value = action;
+  systemSettings.platformSettingActiveSessionsMaxExceededAction = exceedAction;
+
   // Modify the settings on Deep Security Manager
   const systemSettingsApi = new api.SystemSettingsApi();
   return systemSettingsApi.modifySystemSettings(systemSettings, apiVersion);
+};
+
+/**
+ * Configures whether agent-initiated activation is allowed. Demonstrates how to set a single system property.
+ * @param {object} api The api module.
+ * @param {String} apiVersion The api version to use.
+ * @param {number} allowValue Whether to allow agent-initiated activations.
+ * @returns {Promise} The promise that SystemSettingsApi.modifySystemSetting returns.
+ */
+exports.setAgentInitiatedActivationEnabled = function(api, apiVersion, allowValue) {
+  settingName = "platformSettingAgentInitiatedActivationEnabled";
+
+  // Create the settings value
+  const agentInitiatedActionEnabled = new api.SettingValue();
+  agentInitiatedActionEnabled.value = allowValue;
+
+  // Modify the system setting on Deep Security Manager
+  const systemSettingsApi = new api.SystemSettingsApi();
+  return systemSettingsApi.modifySystemSetting(settingName, allowValue, apiVersion);
 };
 
 /**

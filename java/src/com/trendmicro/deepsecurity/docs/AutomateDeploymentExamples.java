@@ -32,26 +32,52 @@ import com.trendmicro.deepsecurity.model.SystemSettings;
 public class AutomateDeploymentExamples {
 
 	/**
-	 * Configures the maximum number of active sessions allowed for users. Demonstrates how to configure system properties.
+	 * Configures the maximum number of active sessions allowed for users, and the action to take when the maximum is exceeded. 
+	 * Demonstrates how to set multiple system properties.
 	 * 
 	 * @param maxSessions The maximum number of active sessions.
+	 * @param exceedAction The action to take when a user exceeds the maximum number of sessions. Valid values are "Block new sessions" and "Expire oldest session".
 	 * @param apiVersion The version of the API to use.
 	 * @throws ApiException if a problem occurs when modifying the system settings on Deep Security Manager.
 	 * @return The updated system settings.
 	 */
-	public static SystemSettings configureMaxSessions(int maxSessions, String apiVersion) throws ApiException {
+	public static SystemSettings configureMaxSessions(int maxSessions, String exceedAction, String apiVersion) throws ApiException {
 
-		// Create the setting value
+		// Create the setting value for PlatformSettingActiveSessionsMax
 		SettingValue maxSessionsValue = new SettingValue();
 		maxSessionsValue.setValue(Integer.toString(maxSessions));
 
 		// Create a SystemSettings object and set the property
 		SystemSettings systemSettings = new SystemSettings();
 		systemSettings.setPlatformSettingActiveSessionsMax(maxSessionsValue);
+		
+		// Repeat for platformSettingActiveSessionsMaxExceededAction
+		SettingValue maxSessionsExceededAction = new SettingValue();
+		maxSessionsExceededAction.setValue(exceedAction);
+		systemSettings.setPlatformSettingActiveSessionsMaxExceededAction(maxSessionsExceededAction);
 
 		// Modify system settings on Deep Security Manager
 		SystemSettingsApi settingsApi = new SystemSettingsApi();
 		return settingsApi.modifySystemSettings(systemSettings, apiVersion);
+	}
+	/**
+	 * Configures whether agent-initiated activation is allowed. Demonstrates how to set a single system property.
+	 * 
+	 * @param allowValue Whether to allow agent-initiated activations. 
+	 * @param apiVersion The version of the API to use.
+	 * @throws ApiException if a problem occurs when modifying the system setting on Deep Security Manager.
+	 * @return The updated system setting value.
+	 */
+	public static SettingValue setAllowAgentInitiatedActivation(String allowValue, String apiVersion) throws ApiException {
+		String settingName = "platformSettingAgentInitiatedActivationEnabled";
+		
+		// Create the setting value
+		SettingValue agentInitiatedActivationEnabled = new SettingValue();
+		agentInitiatedActivationEnabled.setValue(allowValue);
+		
+		// Modify the system setting on Deep Security Manager
+		SystemSettingsApi settingsApi = new SystemSettingsApi();
+		return settingsApi.modifySystemSetting(settingName, agentInitiatedActivationEnabled, apiVersion);
 	}
 
 	/**
