@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 
+
 def get_network_engine_mode(api, configuration, api_version, api_exception, policy_id):
     """ Gets the value of the firewall_setting_network_engine_mode property of a policy.
 
@@ -24,21 +25,17 @@ def get_network_engine_mode(api, configuration, api_version, api_exception, poli
     :return: A string with the firewall_setting_network_engine_mode value.
     """
 
-    # Get the policy details from Deep Security Manager
-    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+    setting_name = "firewall_setting_network_engine_mode"
+    policy_settings_class = getattr(api.models, "PolicySettings")
+    friendly_setting_name = policy_settings_class.attribute_map[setting_name]
 
     try:
-        policy = policies_api.describe_policy(policy_id, api_version, overrides=False)
-        policy_settings = policy.policy_settings
-
-        # Get the setting value
-        network_engine_mode_value = policy_settings.firewall_setting_network_engine_mode
-
-        return network_engine_mode_value
+        # Get the policy details from Deep Security Manager
+        policies_api = api.PoliciesApi(api.ApiClient(configuration))
+        return policies_api.describe_policy_setting(policy_id, friendly_setting_name, api_version, overrides=False)
 
     except api_exception as e:
         return "Exception: " + str(e)
-
 
 
 def set_network_engine_mode_to_inline(api, configuration, api_version, api_exception, policy_id):
@@ -49,22 +46,64 @@ def set_network_engine_mode_to_inline(api, configuration, api_version, api_excep
     :param api_version: The version of the API to use.
     :param api_exception: The Deep Security API exception module.
     :param policy_id: The id of the policy to get the firewall_setting_network_engine_mode value from.
-    :return: A PoliciesApi object with the modified policy.
+    :return: A SettingValue object that contains the modified value.
     """
 
     # Create a SettingValue object and set the value to either "Inline" or "Tap"
     network_engine_mode_value = api.SettingValue()
     network_engine_mode_value.value = "Inline"
-    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+
+    # Setting name
+    #  setting_name = api.SystemSettings.attribute_map[
+    #      api.PolicySettings.firewall_setting_network_engine_mode.fget.__name__]
+    setting_name = "firewall_setting_network_engine_mode"
+    policy_settings_class = getattr(api.models, "PolicySettings")
+    friendly_setting_name = policy_settings_class.attribute_map[setting_name]
 
     try:
-        # Create a policy and add the setting value
-        policy = policies_api.describe_policy(policy_id, api_version)
-        policy_settings = policy.policy_settings
-        policy_settings.firewall_setting_network_engine_mode = network_engine_mode_value
+        # Modify the setting on Deep Security Manager
+        policies_api = api.PoliciesApi(api.ApiClient(configuration))
+        return policies_api.modify_policy_setting(policy_id, friendly_setting_name, network_engine_mode_value, api_version, overrides=False)
 
+    except api_exception as e:
+        return "Exception: " + str(e)
+
+
+def set_firewall_fail_open_behavior(api, configuration, api_version, api_exception, fail_open, policy_id):
+    """ Configures Firewall to operate in fail open or fail closed mode for a policy. Demonstrates how to configure multiple policy settings.
+
+    :param api: The Deep Security API modules.
+    :param configuration: Configuration object to pass to the api client.
+    :param api_version: The version of the API to use.
+    :param api_exception: The Deep Security API exception module.
+    :param fail_open: Indicates whether to enable fail open or fail closed mode. Set to True for fail open.
+    :param policy_id: The id of the policy to get the firewall_setting_network_engine_mode value from.
+    :return: A Policies object with the modified policy.
+    """
+
+    # Create the SettingValue objects
+    failure_response_engine_system = api.SettingValue()
+    failure_response_packet_sanity_check = api.SettingValue()
+
+    # Set the values
+    if fail_open:
+        failure_response_engine_system.value = failure_response_packet_sanity_check.value = "Fail open"
+    else:
+        failure_response_engine_system.value = failure_response_packet_sanity_check.value = "Fail closed"
+
+    # Set the setting values and add to a policy
+    policy_settings = api.PolicySettings()
+    policy_settings.firewall_setting_failure_response_engine_system = failure_response_engine_system
+    policy_settings.firewall_setting_failure_response_packet_sanity_check = failure_response_packet_sanity_check
+
+    policy = api.Policy()
+    policy.policy_settings = policy_settings
+
+    try:
         # Modify the policy on the Deep Security Manager.
+        policies_api = api.PoliciesApi(api.ApiClient(configuration))
         return policies_api.modify_policy(policy_id, policy, api_version, overrides=False)
 
     except api_exception as e:
         return "Exception: " + str(e)
+

@@ -25,23 +25,20 @@ def override_reconnaissance_scan(api, configuration, api_version, api_exception,
     :return: A Computer object that contains only overrides.
     """
 
-    # Set the Reconnaissance Scan value
+    # Setting name
+    #  setting_name = api.SystemSettings.attribute_map[
+    #      api.PolicySettings.firewall_setting_network_engine_mode.fget.__name__]
+    setting_name = "firewall_setting_reconnaissance_enabled"
+
+    # Set the reconnaissance scan value
     setting_value = api.SettingValue()
-    setting_value.value = "false"
-
-    # Add the SettingValue to a ComputerSettings object
-    computer_settings = api.ComputerSettings()
-    computer_settings.firewall_setting_reconnaissance_enabled = setting_value
-
-    # Add the ComputerSettings object to a Computer object
-    computer = api.Computer()
-    computer.computer_settings = computer_settings
+    setting_value.value = "true"
 
     try:
         # Apply the override to the computer
         computers_api = api.ComputersApi(api.ApiClient(configuration))
 
-        return computers_api.modify_computer(computer_id, computer, api_version, overrides=True)
+        return computers_api.modify_computer_setting(computer_id, setting_name, setting_value, api_version, overrides=True)
 
     except api_exception as e:
         return "Exception: " + str(e)

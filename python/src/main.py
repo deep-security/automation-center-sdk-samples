@@ -42,8 +42,8 @@ import scheduled_task_examples
 import role_examples
 import rate_limit_examples
 
-# Uncomment to allow connections that are 'secured' with self-signed certificate 
-# urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# Uncomment to allow connections that are 'secured' with self-signed certificate
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Get the DSM URL and API key from a JSON file
 property_file = os.path.dirname(os.path.abspath(__file__)) + '/properties.json'
@@ -139,7 +139,8 @@ new_policy.auto_requires_update = "on"
 new_policy.parent_id = 1
 
 # For Settings examples
-settings_policy_id = 9
+settings_policy_id = 1
+firewall_fail_open_mode = True
 
 # For Computer Overrides examples
 override_computer_id = 2
@@ -157,31 +158,39 @@ role_name = "Auditor"
 
 # For Automate Deployment examples
 host_name = "testhostname"
+max_sessions = 10
+max_sessions_exceeded_action = "Block new sessions"
+allow_agent_initiated_activation = 0
 
 
 def main():
 
     # Rate Limit example
+    """
     print(
         "Displaying result from role_limit_examples.set_computer_policy_check_rate_limit\n" +
         str(rate_limit_examples.set_computer_policy_check_rate_limit(
             api, configuration, api_version, api_exception, computer_ids, policy_id))
     )
+    """
 
     # Role examples
+    """
     print(
         "Displaying results from role_examples.search_roles_by_name:\n" +
         str(role_examples.search_roles_by_name(
             api, configuration, api_version, api_exception, role_name))
     )
-
+    
     print(
         "Displaying results from role_examples.create_role_for_computer_reports:\n" +
         str(role_examples.create_role_for_computer_reports(
             api, configuration, api_version, api_exception))
     )
+    """
 
     # Scheduled Task examples
+    """
     print(
         "Displaying results from scheduled_task_examples.create_daily_schedule_details:\n" +
         str(scheduled_task_examples.create_daily_schedule_details(
@@ -211,6 +220,7 @@ def main():
         str(scheduled_task_examples.run_scheduled_task(
             api, configuration, api_version, api_exception, scheduled_task_id))
     )
+    """
 
     # Computer Overrides examples
     print(
@@ -218,14 +228,17 @@ def main():
         str(computer_override_examples.override_reconnaissance_scan(
             api, configuration, api_version, api_exception, override_computer_id))
     )
+    """
 
     print(
         "Displaying results from computer_override_examples.get_computer_overrides:\n" +
         str(computer_override_examples.get_computer_overrides(
             api, configuration, api_version, api_exception, override_computer_id, expand))
     )
+    """
 
     # Settings examples
+    """
     print(
         "Displaying results from settings_examples.get_network_engine_mode:\n" +
         str(settings_examples.get_network_engine_mode(
@@ -238,18 +251,32 @@ def main():
             api, configuration, api_version, api_exception, settings_policy_id))
     )
 
+    print(
+        "Displaying results from settings_examples.set_firewall_fail_open_behavior:\n" +
+        str(settings_examples.set_firewall_fail_open_behavior(api, configuration, api_version, api_exception, firewall_fail_open_mode, settings_policy_id))
+    )
+    """
+
     # Application Control example
+    """
     print(
         "Displaying results from application_control_examples.configure_application_control:\n" +
         str(application_control_examples.configure_application_control(
             api, configuration, api_version, api_exception, policy_id))
     )
+    """
 
     # Automate Deployment examples
+    """
     print(
-        "Displaying results from automate_deployment_examples.configure_system_settings:\n" +
-        str(automate_deployment_examples.configure_system_settings(
-            api, configuration, api_version, api_exception))
+        "Displaying results from automate_deployment_examples.configure_max_sessions:\n" +
+        str(automate_deployment_examples.configure_max_sessions(
+            api, configuration, api_version, api_exception, max_sessions, max_sessions_exceeded_action))
+    )
+
+    print(
+        "Displaying results from automate_deployment_examples.set_allow_agent_initiated_activation:\n" +
+        str(automate_deployment_examples.set_allow_agent_initiated_activation(api, configuration, api_version, api_exception, allow_agent_initiated_activation))
     )
 
     print(
@@ -265,8 +292,10 @@ def main():
             api, configuration, api_version, api_exception, "linux"
         )
     )
+    """
 
     # Policy examples
+    """
     print(
         "Displaying results from policy_examples.create_policy:\n" +
         str(policy_examples.create_policy(
@@ -284,15 +313,19 @@ def main():
         str(policy_examples.selective_reset_for_log_inspection_rule_on_policy(
             api, configuration, api_version, api_exception, reset_li_policy_id, reset_li_rule_id))
     )
+    """
 
     # Integrity Monitoring example
+    """
     print(
         "Displaying results from integrity_monitoring_examples.configure_integrity_monitoring:\n" +
         str(integrity_monitoring_examples.configure_integrity_monitoring(
             api, configuration, api_version, api_exception, policy_id, im_rule_ids))
     )
+    """
 
     # Intrusion Prevention examples
+    """
     print(
         "Displaying results from intrusion_prevention_examples.modify_intrusion_prevention_policy:\n" +
         str(intrusion_prevention_examples.modify_intrusion_prevention_policy(
@@ -304,29 +337,37 @@ def main():
         str(intrusion_prevention_examples.get_assigned_intrusion_prevention_rules(
             api, configuration, api_version, api_exception))
     )
+    """
 
     # Log Inspection Examples
+    """
     print(
         "Displaying results from log_inspection_examples.configure_log_inspection:\n" +
         str(log_inspection_examples.configure_log_inspection(
             api, configuration, api_version, api_exception, policy_id, li_rules))
     )
+    """
 
     # Web Reputation examples
+    """
     print(
         "Displaying results from web_reputation_examples.configure_web_reputation:\n" +
         str(web_reputation_examples.configure_web_reputation(
             api, configuration, api_version, api_exception, policy_id, security_level))
     )
+    """
 
     # Anti-Malware example
+    """
     print(
         "Displaying results from anti_malware_examples.modify_anti_malware_policy:\n" +
         str(anti_malware_examples.modify_anti_malware_policy(
             api, configuration, api_version, api_exception, policy_id, real_time_scan_config_id, real_time_scan_schedule_id))
     )
+    """
 
     # API Key examples
+    """
     print(
         "Displaying results from api__key_examples.create_audit_key:\n" +
         str(api_key_examples.create_audit_key(
@@ -344,22 +385,28 @@ def main():
         str(api_key_examples.modify_key_role(
             api, configuration, api_version, api_exception, key_id, role_id))
     )
+    """
 
     # Firewall example
+    """
     print(
         "Displaying results from firewall_examples.modify_firewall_policy:\n" +
         str(firewall_examples.modify_firewall_policy(
             api, configuration, api_version, api_exception, rule_ids, policy_id))
     )
+    """
 
     # First Steps Post example
+    """
     print(
         "Displaying results from first_steps_post_examples.search_firewall_rules:\n" +
         str(first_steps_post_examples.search_firewall_rules(
             api, configuration, api_version, api_exception))
     )
+    """
 
     # Search examples
+    """
     print(
         "Displaying results from search_examples.search_policies_by_name:\n" +
         str(search_examples.search_policies_by_name(
@@ -389,8 +436,10 @@ def main():
         str(search_examples.search_computers_by_aws_account(
             api, configuration, api_version, api_exception, "my aws account ID"))
     )
+    """
 
     # Computer Status examples
+    """
     print(
         "Displaying results from computer_status_examples.check_anti_malware:\n" +
         str(computer_status_examples.check_anti_malware(
@@ -433,8 +482,10 @@ def main():
         str(computer_status_examples.get_anti_malware_status_for_computers(
             api, configuration, api_version, api_exception))
     )
+    """
 
     # Common Objects examples
+    """
     print(
         "Displaying results from common_objects_examples.create_log_inspection_rule:\n" +
         str(common_objects_examples.create_log_inspection_rule(
@@ -464,8 +515,10 @@ def main():
         str(common_objects_examples.create_business_hours_schedule(
             api, configuration, api_version, api_exception))
     )
+    """
 
     # Tenant examples
+    """
     print(
         "Displaying results from tenant_examples.create_tenant:\n" +
         str(tenant_examples.create_tenant(
@@ -495,13 +548,16 @@ def main():
         str(tenant_examples.add_policy_to_tenant(
             api, configuration, api_version, api_exception, new_policy, tenant_id))
     )
+    """
 
     # First Steps Get example
+    """
     print(
         "Displaying results from first_steps_get_examples.get_policies_list:\n" +
         str(first_steps_get_examples.get_policies_list(
             api, configuration, api_version, api_exception))
     )
+    """
 
 
 if __name__ == '__main__':

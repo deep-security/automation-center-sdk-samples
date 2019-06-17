@@ -35,21 +35,21 @@ public class ComputerOverrideExamples {
 	 * @throws ApiException if a problem occurs when modifying the computer on Deep Security Manager.
 	 * @return A Computer object that contains only overrides.
 	 */
-	public static Computer overrideReconnaissanceScan(Integer computerId, String apiVersion) throws ApiException {
+	public static SettingValue overrideReconnaissanceScan(Integer computerId, String apiVersion) throws ApiException {
 
-		// Turn on Reconnaissance Scan
-		ComputerSettings computerSettings = new ComputerSettings();
+		// Setting name
+		String settingName = "firewallSettingReconnaissanceEnabled";
+		
+		// Set the reconnaissance scan property value
 		SettingValue settingValue = new SettingValue();
 		settingValue.setValue("true");
-		computerSettings.setFirewallSettingReconnaissanceEnabled(settingValue);
 
-		// Add to a computer object
-		Computer computer = new Computer();
-		computer.setComputerSettings(computerSettings);
-
+		// Overrides
+		Boolean overrides = Boolean.TRUE;
+		
 		// Update on Deep Security Manager
 		ComputersApi computersApi = new ComputersApi();
-		return computersApi.modifyComputer(computerId, computer, Boolean.TRUE, apiVersion);
+		return computersApi.modifyComputerSetting(computerId, settingName, settingValue, overrides, apiVersion);
 	}
 
 	/**
