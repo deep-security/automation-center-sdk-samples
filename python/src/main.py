@@ -42,7 +42,8 @@ import scheduled_task_examples
 import role_examples
 import rate_limit_examples
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# Uncomment to allow connections that are 'secured' with self-signed certificate 
+# urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Get the DSM URL and API key from a JSON file
 property_file = os.path.dirname(os.path.abspath(__file__)) + '/properties.json'
