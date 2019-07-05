@@ -21,48 +21,32 @@
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the new tentant.
  */
-exports.createTenant = function (api, accountName, apiVersion) {
-  return new Promise((resolve, reject) => {
-    // Tenant object
-    const tenant = new api.Tenant();
+exports.createTenant = function(api, accountName, apiVersion) {
+  // Tenant object
+  const tenant = new api.Tenant();
 
-    // Set the visible modules
-    tenant.modulesVisible = [
-      api.Tenant.ModulesVisibleEnum["anti-malware"],
-      api.Tenant.ModulesVisibleEnum.firewall,
-      api.Tenant.ModulesVisibleEnum["intrusion-prevention"]
-    ];
+  // Set the visible modules
+  tenant.modulesVisible = [api.Tenant.ModulesVisibleEnum['anti-malware'], api.Tenant.ModulesVisibleEnum.firewall, api.Tenant.ModulesVisibleEnum['intrusion-prevention']];
 
-    // Set the account name
-    tenant.name = accountName;
+  // Set the account name
+  tenant.name = accountName;
 
-    // Define the administrator account
-    const admin = new api.Administrator();
-    admin.username = "MasterAdmin";
-    admin.password = "P@55word";
-    admin.emailAddress = "example@email.com";
-    tenant.administrator = admin;
+  // Define the administrator account
+  const admin = new api.Administrator();
+  admin.username = 'MasterAdmin';
+  admin.password = 'P@55word';
+  admin.emailAddress = 'example@email.com';
+  tenant.administrator = admin;
 
-    // Set the locale and description
-    tenant.locale = api.Tenant.LocaleEnum["en-US"];
-    tenant.description = "Test tenant.";
+  // Set the locale and description
+  tenant.locale = api.Tenant.LocaleEnum['en-US'];
+  tenant.description = 'Test tenant.';
 
-    // Creates the tenant
-    const createTenant = () => {
-      const tenantsApi = new api.TenantsApi();
-      return tenantsApi.createTenant(tenant, apiVersion, {
-        confirmationRequired: "false",
-        asynchronous: "true"
-      });
-    };
-
-    createTenant()
-      .then(newTenant => {
-        resolve(newTenant);
-      })
-      .catch(error => {
-        reject(error);
-      });
+  // Create the tenant
+  const tenantsApi = new api.TenantsApi();
+  return tenantsApi.createTenant(tenant, apiVersion, {
+    confirmationRequired: 'false',
+    asynchronous: 'true',
   });
 };
 
@@ -73,7 +57,7 @@ exports.createTenant = function (api, accountName, apiVersion) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains computer IDs and the module running state.
  */
-exports.getIPStatesForTenant = function (api, tenantID, apiVersion) {
+exports.getIPStatesForTenant = function(api, tenantID, apiVersion) {
   return new Promise((resolve, reject) => {
     // Stores the Intrusion Prevention states
     const computerIPStates = [];
@@ -82,10 +66,10 @@ exports.getIPStatesForTenant = function (api, tenantID, apiVersion) {
     const createKey = () => {
       // ApiKey properties
       const key = new api.ApiKey();
-      key.keyName = "Temporary Key";
+      key.keyName = 'Temporary Key';
       key.roleID = 1;
-      key.locale = api.ApiKey.LocaleEnum["en-US"];
-      key.timeZone = "Asia/Tokyo";
+      key.locale = api.ApiKey.LocaleEnum['en-US'];
+      key.timeZone = 'Asia/Tokyo';
 
       const tenantsApi = new api.TenantsApi();
       return tenantsApi.generateTenantApiSecretKey(tenantID, key, apiVersion);
@@ -94,25 +78,15 @@ exports.getIPStatesForTenant = function (api, tenantID, apiVersion) {
     // Gets a list of tenant computers
     const getComputers = apiClient => {
       const computersApi = new api.ComputersApi(apiClient);
-      return computersApi.listComputers(apiVersion, { overrides: "false" });
+      return computersApi.listComputers(apiVersion, { overrides: 'false' });
     };
 
-    // Deletes an ApiKey from a tenant
-    const deleteKey = (apiClient, keyID) => {
-      const apiKeysApi = new api.APIKeysApi();
-      apiKeysApi.deleteApiKey(keyID, apiVersion).catch(error => {
-        console.log(error);
-      });
-    };
-
-    // Configure the ApiClient for connecting to the tenant
+    // Configure the ApiClient for the tenant
     const tenantClient = api.ApiClient.instance;
-    const defaultAuthentication = tenantClient.authentications["DefaultAuthentication"];
-    let tenantKey;
+    const defaultAuthentication = tenantClient.authentications['DefaultAuthentication'];
 
     createKey()
       .then(newKey => {
-        tenantKey = newKey;
         defaultAuthentication.apiKey = newKey.secretKey;
         return getComputers(tenantClient);
       })
@@ -121,10 +95,9 @@ exports.getIPStatesForTenant = function (api, tenantID, apiVersion) {
         for (let i = 0; i < computers.computers.length; i++) {
           computerIPStates[i] = {
             ID: computers.computers[i].ID,
-            IpState: computers.computers[i].intrusionPrevention.state
+            IpState: computers.computers[i].intrusionPrevention.state,
           };
         }
-        deleteKey(tenantClient, tenantKey.ID);
         resolve(computerIPStates);
       })
       .catch(error => {
@@ -141,33 +114,28 @@ exports.getIPStatesForTenant = function (api, tenantID, apiVersion) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains, for each tenant, computer IDs and the rule IDs.
  */
-exports.getIpRulesForTenantComputers = function (api, apiVersion, secretKey) {
+exports.getIpRulesForTenantComputers = function(api, apiVersion, secretKey) {
   return new Promise((resolve, reject) => {
-    let tenantRules, tenantKeys;
     const keyPromises = [];
     const rulePromises = [];
-    const deleteKeyPromises = [];
 
     // Search for active tenants
     const tenantsApi = new api.TenantsApi();
 
     // Search criteria
     const searchCriteria = new api.SearchCriteria();
-    searchCriteria.fieldName = "tenantState";
+    searchCriteria.fieldName = 'tenantState';
     searchCriteria.choiceTest = api.SearchCriteria.ChoiceTestEnum.equal;
-    searchCriteria.choiceValue = "active";
+    searchCriteria.choiceValue = 'active';
 
     // Search filter
     const searchFilter = new api.SearchFilter();
     searchFilter.searchCriteria = [searchCriteria];
 
-    // Search options; Include Intrusion Prevention information in the returned Computer objects
-    const Options = api.Expand.OptionsEnum;
-    const expand = new api.Expand.Expand(Options.all);
+    // Search options
     const searchOptions = {
       searchFilter: searchFilter,
-      expand: expand.list(),
-      overrides: false
+      overrides: false,
     };
 
     // Perform the search
@@ -185,7 +153,6 @@ exports.getIpRulesForTenantComputers = function (api, apiVersion, secretKey) {
         return Promise.all(keyPromises);
       })
       .then(keyObjects => {
-        tenantKeys = keyObjects;
         // For each tenant, get the IP rules for all computers
         // Store each promise in an array
         keyObjects.forEach(keyObject => {
@@ -195,23 +162,13 @@ exports.getIpRulesForTenantComputers = function (api, apiVersion, secretKey) {
         return Promise.all(rulePromises);
       })
       .then(ruleListObjects => {
-        tenantRules = ruleListObjects;
-        // Delete each tenant key
-        // Store each promise in an array
-        tenantKeys.forEach(tenantKey => {
-          deleteKeyPromises.push(deleteKey(tenantKey.apiKey, api, apiVersion));
-        });
-        // Continue when all promises are resolved
-        return Promise.all(deleteKeyPromises);
-      })
-      .then(() => {
         // Configure ApiClient to use the primary tenant's API Key before returning
         const apiClient = api.ApiClient.instance;
-        const DefaultAuthentication = apiClient.authentications["DefaultAuthentication"];
+        const DefaultAuthentication = apiClient.authentications['DefaultAuthentication'];
         DefaultAuthentication.apiKey = secretKey;
 
         // Return the rule IDs
-        resolve(tenantRules);
+        resolve(ruleListObjects);
       })
       .catch(error => {
         reject(error);
@@ -226,10 +183,14 @@ function createKey(tenantID, api, apiVersion) {
   return new Promise((resolve, reject) => {
     // ApiKey properties
     const key = new api.ApiKey();
-    key.keyName = "Temporary Key" + Math.random().toString(36).substring(7);
+    key.keyName =
+      'Temporary Key' +
+      Math.random()
+        .toString(36)
+        .substring(7);
     key.roleID = 1;
-    key.locale = api.ApiKey.LocaleEnum["en-US"];
-    key.timeZone = "Asia/Tokyo";
+    key.locale = api.ApiKey.LocaleEnum['en-US'];
+    key.timeZone = 'Asia/Tokyo';
 
     // Create the key
     const tenantsApi = new api.TenantsApi();
@@ -252,7 +213,7 @@ function getComputers(tenantKey, tenantID, api, apiVersion) {
 
     // Configure ApiClient
     const tenantClient = api.ApiClient.instance;
-    const DefaultAuthentication = tenantClient.authentications["DefaultAuthentication"];
+    const DefaultAuthentication = tenantClient.authentications['DefaultAuthentication'];
     DefaultAuthentication.apiKey = tenantKey.secretKey;
 
     // Include Intrusion Prevention information in the retrieved Computer objects
@@ -260,7 +221,7 @@ function getComputers(tenantKey, tenantID, api, apiVersion) {
     const expand = new api.Expand.Expand(Options.intrusionPrevention);
     const opts = {
       expand: expand.list(),
-      overrides: false
+      overrides: false,
     };
 
     // Get the computers from the tenant
@@ -273,7 +234,7 @@ function getComputers(tenantKey, tenantID, api, apiVersion) {
           // Store as objects that contain the computer ID and the rule IDs
           computerIPRules.push({
             ID: computers.computers[i].ID,
-            IpRules: computers.computers[i].intrusionPrevention.ruleIDs
+            IpRules: computers.computers[i].intrusionPrevention.ruleIDs,
           });
         }
         // Return an object that contains the tenant ID and the array of computer and rule IDs
@@ -285,17 +246,6 @@ function getComputers(tenantKey, tenantID, api, apiVersion) {
   });
 }
 
-// Deletes an ApiKey from a tenant
-function deleteKey(tenantKey, api, apiVersion) {
-  // Configure ApiClient;
-  const tenantClient = api.ApiClient.instance;
-  const DefaultAuthentication = tenantClient.authentications["DefaultAuthentication"];
-  DefaultAuthentication.apiKey = tenantKey.secretKey;
-  // Delete the key
-  const apiKeysApi = new api.APIKeysApi();
-  return apiKeysApi.deleteApiKey(tenantKey.ID, apiVersion);
-}
-
 /**
  * Adds a policy to a tenant.
  * @param {object} api The api module.
@@ -304,16 +254,16 @@ function deleteKey(tenantKey, api, apiVersion) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the new policy.
  */
-exports.addPolicyToTenant = function (api, policy, tenantID, apiVersion) {
+exports.addPolicyToTenant = function(api, policy, tenantID, apiVersion) {
   return new Promise((resolve, reject) => {
     // Creates an API key
     const createKey = () => {
       // ApiKey properties
       const key = new api.ApiKey();
-      key.keyName = "Test Key";
+      key.keyName = 'Test Key';
       key.roleID = 1;
-      key.locale = api.ApiKey.LocaleEnum["en-US"];
-      key.timeZone = "Asia/Tokyo";
+      key.locale = api.ApiKey.LocaleEnum['en-US'];
+      key.timeZone = 'Asia/Tokyo';
       const tenantsApi = new api.TenantsApi();
       return tenantsApi.generateTenantApiSecretKey(tenantID, key, apiVersion);
     };
@@ -324,27 +274,16 @@ exports.addPolicyToTenant = function (api, policy, tenantID, apiVersion) {
       return policiesApi.createPolicy(policy, apiVersion, { overrides: false });
     };
 
-    // Deletes an ApiKey from a tenant
-    const deleteKey = (apiClient, keyID) => {
-      const apiKeysApi = new api.APIKeysApi();
-      apiKeysApi.deleteApiKey(keyID, apiVersion).catch(error => {
-        console.log(error);
-      });
-    };
-
     // ApiClient for connecting to the tenant
     const tenantClient = api.ApiClient.instance;
-    const DefaultAuthentication = tenantClient.authentications["DefaultAuthentication"];
-    let tenantKey;
+    const DefaultAuthentication = tenantClient.authentications['DefaultAuthentication'];
     createKey()
       .then(newKey => {
-        tenantKey = newKey;
         DefaultAuthentication.apiKey = newKey.secretKey;
         return addPolicy(tenantClient);
       })
       .then(newPolicy => {
-        deleteKey(tenantClient, tenantKey.ID);
-        resolve(newPolicy);
+        resolve(newPolicy.ID);
       })
       .catch(error => {
         reject(error);
