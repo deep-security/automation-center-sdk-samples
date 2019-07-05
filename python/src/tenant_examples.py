@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import random
-import string
 
 
 def create_tenant(api, configuration, api_version, api_exception, account_name):
@@ -69,6 +67,8 @@ def get_ip_states_for_tenant(api, configuration, api_version, api_exception, ten
     :return: A dictionary that contains computer IDs and the module running state.
     """
 
+    computer_ip_states = {}
+
     primary_key = configuration.api_key['api-secret-key']
 
     # Create an API key
@@ -80,38 +80,29 @@ def get_ip_states_for_tenant(api, configuration, api_version, api_exception, ten
 
     try:
         # Check that the tenant is in the 'active' state
-        import time
-        while True:
-            state = api.TenantsApi(api.ApiClient(configuration)).describe_tenant(tenant_id, api_version).tenant_state
-            if state == 'active':
-                break
-            time.sleep(5)
+        state = api.TenantsApi(api.ApiClient(configuration)).describe_tenant(tenant_id, api_version).tenant_state
+        if state == 'active':
 
-        # Generate the secret key for the tenant
-        tenants_api = api.TenantsApi(api.ApiClient(configuration))
-        generated_key = tenants_api.generate_tenant_api_secret_key(tenant_id, key, api_version)
+            # Generate the secret key for the tenant
+            tenants_api = api.TenantsApi(api.ApiClient(configuration))
+            generated_key = tenants_api.generate_tenant_api_secret_key(tenant_id, key, api_version)
 
-        # Add the secret key to the configuration
-        configuration.api_key['api-secret-key'] = generated_key.secret_key
+            # Add the secret key to the configuration
+            configuration.api_key['api-secret-key'] = generated_key.secret_key
 
-        # Include Intrusion Prevention information in the returned Computer objects
-        expand = api.Expand(api.Expand.intrusion_prevention)
+            # Include Intrusion Prevention information in the returned Computer objects
+            expand = api.Expand(api.Expand.intrusion_prevention)
 
-        # Get a list of tenant computers
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
+            # Get a list of tenant computers
+            computers_api = api.ComputersApi(api.ApiClient(configuration))
+            computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
-        # Find the Intrusion Prevention state for each computer
-        computer_ip_states = {}
-        for computer in computers_list.computers:
-            computer_ip_states[computer.id] = computer.intrusion_prevention.state
+            # Find the Intrusion Prevention state for each computer
+            for computer in computers_list.computers:
+                computer_ip_states[computer.id] = computer.intrusion_prevention.state
 
-        # Delete an ApiKey from the tenant
-        api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
-        api_keys_api.delete_api_key(generated_key.id, api_version)
-
-        # Reset the API key to the primary key
-        configuration.api_key['api-secret-key'] = primary_key
+            # Reset the API key to the primary key
+            configuration.api_key['api-secret-key'] = primary_key
 
         return computer_ip_states
 
@@ -145,7 +136,7 @@ def get_ip_rules_for_tenant_computers(api, configuration, api_version, api_excep
 
                 # Create an API key
                 key = api.ApiKey()
-                key.key_name = "Temporary Key for getting IP rules from tenant computers" + "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+                key.key_name = "Temporary Key for getting IP rules from tenant computers"
                 key.role_id = 1
                 key.locale = "en-US"
                 key.time_zone = "Asia/Tokyo"
@@ -171,9 +162,6 @@ def get_ip_rules_for_tenant_computers(api, configuration, api_version, api_excep
                 for computer in computers_list.computers:
                     computer_ip_rules[computer.id] = computer.intrusion_prevention.rule_ids
 
-                # Delete the ApiKey from the tenant
-                api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
-                api_keys_api.delete_api_key(generated_key.id, api_version)
                 tenant_rules[tenant.id] = computer_ip_rules
 
                 # Reset the API key to the primary key
@@ -183,6 +171,66 @@ def get_ip_rules_for_tenant_computers(api, configuration, api_version, api_excep
 
     except api_exception as e:
         return "Exception: " + str(e)
+
+
+'''
+def get_tenant_rules(api, configuration, api_version, api_exception, tenant_id):
+    """ Obtains the IDs of the Intrusion Prevention rules that are assigned to a tenant's computers.
+
+    :param api: The Deep Security API modules.
+    :param configuration: Configuration object to pass to the api client.
+    :param api_version: The version of the API to use.
+    :param api_exception: The Deep Security API exception module.
+    :param tenant_id: The ID of the tenant.
+    :return: A dictionary that contains computer IDs and their rule IDs.
+    """
+
+    rule_ids = {}
+    primary_key = configuration.api_key['api-secret-key']
+
+    # Create an API key
+    key = api.ApiKey()
+    key.key_name = "Temporary Key for getting tenant rules from tenant computers"
+    key.role_id = 1
+    key.locale = "en-US"
+    key.time_zone = "Asia/Tokyo"
+
+    # Add the key to the Deep Security Manager
+    try:
+        # Check that the tenant is in the 'active' state
+        state = api.TenantsApi(api.ApiClient(configuration)).describe_tenant(tenant_id, api_version).tenant_state
+        if state == 'active':
+
+            # Generate the secret key for the tenant
+            tenants_api = api.TenantsApi(api.ApiClient(configuration))
+            generated_key = tenants_api.generate_tenant_api_secret_key(tenant_id, key, api_version)
+
+            # Add the secret key to the configuration
+            configuration.api_key['api-secret-key'] = generated_key.secret_key
+
+            # Include Intrusion Prevention information in the retrieved Computer objects
+            expand = api.Expand(api.Expand.intrusion_prevention)
+
+            # Get a list of tenant computers
+            computers_api = api.ComputersApi(api.ApiClient(configuration))
+            computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
+
+            # Find the Intrusion Prevention rule IDs for each computer
+            for computer in computers_list.computers:
+                rule_ids[computer.id] = computer.intrusion_prevention.rule_ids
+
+            # Delete an ApiKey from the tenant
+            api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
+            api_keys_api.delete_api_key(generated_key.id, api_version)
+
+            # Reset the API key to the primary key
+            configuration.api_key['api-secret-key'] = primary_key
+
+        return rule_ids
+
+    except api_exception as e:
+        return "Exception: " + str(e)
+'''
 
 
 def add_policy_to_tenant(api, configuration, api_version, api_exception, policy, tenant_id):
@@ -197,6 +245,7 @@ def add_policy_to_tenant(api, configuration, api_version, api_exception, policy,
     :return: A PoliciesApi object that contains the new tenant.
     """
 
+    tenant_client_with_policy = None
     primary_key = configuration.api_key['api-secret-key']
 
     # Create an API key
@@ -208,30 +257,22 @@ def add_policy_to_tenant(api, configuration, api_version, api_exception, policy,
 
     try:
         # Check that the tenant is in the 'active' state
-        import time
-        while True:
-            state = api.TenantsApi(api.ApiClient(configuration)).describe_tenant(tenant_id, api_version).tenant_state
-            if state == 'active':
-                break
-            time.sleep(5)
+        state = api.TenantsApi(api.ApiClient(configuration)).describe_tenant(tenant_id, api_version).tenant_state
+        if state == 'active':
 
-        # Generate the secret key for the tenant
-        tenants_api = api.TenantsApi(api.ApiClient(configuration))
-        generated_key = tenants_api.generate_tenant_api_secret_key(tenant_id, key, api_version)
+            # Generate the secret key for the tenant
+            tenants_api = api.TenantsApi(api.ApiClient(configuration))
+            generated_key = tenants_api.generate_tenant_api_secret_key(tenant_id, key, api_version)
 
-        # Add the secret key to the configuration
-        configuration.api_key['api-secret-key'] = generated_key.secret_key
+            # Add the secret key to the configuration
+            configuration.api_key['api-secret-key'] = generated_key.secret_key
 
-        # Add the policy
-        tenant_policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        tenant_client_with_policy = tenant_policies_api.create_policy(policy, api_version, overrides=False)
+            # Add the policy
+            tenant_policies_api = api.PoliciesApi(api.ApiClient(configuration))
+            tenant_client_with_policy = tenant_policies_api.create_policy(policy, api_version, overrides=False)
 
-        # Delete an ApiKey from the tenant
-        api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
-        api_keys_api.delete_api_key(generated_key.id, api_version)
-
-        # Reset the API key to the primary key
-        configuration.api_key['api-secret-key'] = primary_key
+            # Reset the API key to the primary key
+            configuration.api_key['api-secret-key'] = primary_key
 
         return tenant_client_with_policy
 

@@ -27,7 +27,6 @@ import java.util.Properties;
 import com.trendmicro.deepsecurity.ApiClient;
 import com.trendmicro.deepsecurity.ApiException;
 import com.trendmicro.deepsecurity.Configuration;
-import com.trendmicro.deepsecurity.api.ApiKeysApi;
 import com.trendmicro.deepsecurity.api.ComputersApi;
 import com.trendmicro.deepsecurity.api.PoliciesApi;
 import com.trendmicro.deepsecurity.api.TenantsApi;
@@ -85,7 +84,7 @@ public class TenantExamples {
 		TenantsApi tenantsApi = new TenantsApi();
 		Boolean confirmationRequired = Boolean.FALSE;
 		Boolean bypassTenantCache = Boolean.TRUE;
-		Boolean asynchronous = Boolean.TRUE;
+		Boolean asynchronous = Boolean.FALSE;
 		
 		return tenantsApi.createTenant(tenant, bypassTenantCache, confirmationRequired, asynchronous, apiVersion);
 	}
@@ -131,10 +130,6 @@ public class TenantExamples {
 			computerIPStates.put(computer.getID(), computer.getIntrusionPrevention().getState());
 		}
 
-		// Delete the tenant key
-		ApiKeysApi tnApiKeysApi = new ApiKeysApi(tenantClient);
-		tnApiKeysApi.deleteApiKey(key.getID(), apiVersion);
-
 		return computerIPStates;
 	}
 
@@ -176,7 +171,6 @@ public class TenantExamples {
 
 			// Search filter
 			SearchFilter searchFilter = new SearchFilter();
-			searchFilter.setMaxItems(Integer.valueOf(1));
 			searchFilter.addSearchCriteriaItem(searchCriteria);
 
 			TenantsApi tenantsApi = new TenantsApi();
@@ -184,12 +178,14 @@ public class TenantExamples {
 
 			// Iterate the tenants
 			for (Tenant tenant : tenants.getTenants()) {
-				// For each tenant create an api key
+				
+				// Create an api key for the tenant
 				ApiKey tenantKey = new ApiKey();
 				tenantKey.setKeyName("Temporary Key");
 				tenantKey.setRoleID(Integer.valueOf(1));
 				tenantKey.setLocale(ApiKey.LocaleEnum.EN_US);
 				tenantKey.setTimeZone("Asia/Tokyo");
+				
 				// Add the key to Deep Security Manager
 				tenantKey = tenantsApi.generateTenantApiSecretKey(tenant.getID(), tenantKey, apiVersion);
 
@@ -209,11 +205,6 @@ public class TenantExamples {
 					computerRules.put(tenantComputer.getID(), (ArrayList<Integer>)intrusionPeventionComputerExtension.getRuleIDs());
 				}
 				tenantMap.put(tenant.getID(), computerRules);
-
-				// Delete the tenant key
-				ApiKeysApi tnApiKeysApi = new ApiKeysApi();
-				tnApiKeysApi.deleteApiKey(tenantKey.getID(), apiVersion);
-				tenantKey = null;
 
 				// Configure the ApiClient to use the primary tenant's Secret Key
 				defaultAuthentication.setApiKey(primarySecretKey);
@@ -240,20 +231,13 @@ public class TenantExamples {
 		tenantKey.setRoleID(Integer.valueOf(1));
 		tenantKey = tenantsApi.generateTenantApiSecretKey(tenantID, tenantKey, apiVersion);
 
-		// Create an ApiClient object for the tenant
+		// Configure ApiClient with the tenant's API key
 		ApiClient tenantClient = Configuration.getDefaultApiClient();
-		tenantClient.setBasePath("https://localhost:4119/api");
 		ApiKeyAuth defaultAuthentication = (ApiKeyAuth)tenantClient.getAuthentication("DefaultAuthentication");
 		defaultAuthentication.setApiKey(tenantKey.getSecretKey());
 
 		// Add the policy
 		PoliciesApi tnPoliciesApi = new PoliciesApi(tenantClient);
-		policy = tnPoliciesApi.createPolicy(policy, Boolean.FALSE, apiVersion);
-
-		// Delete the tenant key
-		ApiKeysApi tnApiKeysApi = new ApiKeysApi(tenantClient);
-		tnApiKeysApi.deleteApiKey(tenantKey.getID(), apiVersion);
-
-		return policy;
+		return tnPoliciesApi.createPolicy(policy, Boolean.FALSE, apiVersion);
 	}
 }
