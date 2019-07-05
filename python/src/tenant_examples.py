@@ -173,66 +173,6 @@ def get_ip_rules_for_tenant_computers(api, configuration, api_version, api_excep
         return "Exception: " + str(e)
 
 
-'''
-def get_tenant_rules(api, configuration, api_version, api_exception, tenant_id):
-    """ Obtains the IDs of the Intrusion Prevention rules that are assigned to a tenant's computers.
-
-    :param api: The Deep Security API modules.
-    :param configuration: Configuration object to pass to the api client.
-    :param api_version: The version of the API to use.
-    :param api_exception: The Deep Security API exception module.
-    :param tenant_id: The ID of the tenant.
-    :return: A dictionary that contains computer IDs and their rule IDs.
-    """
-
-    rule_ids = {}
-    primary_key = configuration.api_key['api-secret-key']
-
-    # Create an API key
-    key = api.ApiKey()
-    key.key_name = "Temporary Key for getting tenant rules from tenant computers"
-    key.role_id = 1
-    key.locale = "en-US"
-    key.time_zone = "Asia/Tokyo"
-
-    # Add the key to the Deep Security Manager
-    try:
-        # Check that the tenant is in the 'active' state
-        state = api.TenantsApi(api.ApiClient(configuration)).describe_tenant(tenant_id, api_version).tenant_state
-        if state == 'active':
-
-            # Generate the secret key for the tenant
-            tenants_api = api.TenantsApi(api.ApiClient(configuration))
-            generated_key = tenants_api.generate_tenant_api_secret_key(tenant_id, key, api_version)
-
-            # Add the secret key to the configuration
-            configuration.api_key['api-secret-key'] = generated_key.secret_key
-
-            # Include Intrusion Prevention information in the retrieved Computer objects
-            expand = api.Expand(api.Expand.intrusion_prevention)
-
-            # Get a list of tenant computers
-            computers_api = api.ComputersApi(api.ApiClient(configuration))
-            computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
-
-            # Find the Intrusion Prevention rule IDs for each computer
-            for computer in computers_list.computers:
-                rule_ids[computer.id] = computer.intrusion_prevention.rule_ids
-
-            # Delete an ApiKey from the tenant
-            api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
-            api_keys_api.delete_api_key(generated_key.id, api_version)
-
-            # Reset the API key to the primary key
-            configuration.api_key['api-secret-key'] = primary_key
-
-        return rule_ids
-
-    except api_exception as e:
-        return "Exception: " + str(e)
-'''
-
-
 def add_policy_to_tenant(api, configuration, api_version, api_exception, policy, tenant_id):
     """ Adds a policy to a tenant.
 
