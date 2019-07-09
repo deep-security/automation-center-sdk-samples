@@ -228,14 +228,7 @@ def get_computer_statuses(api, configuration, api_version, api_exception):
                 computer_info.append(status_messages)
 
                 # Add the computer info to the CSV string
-                csv_line = ""
-                for num, item in enumerate(computer_info):
-                    csv_line += item
-                    if num != (len(computer_info) - 1):
-                        csv_line += ","
-                    else:
-                        csv_line += "\r\n"
-                csv += csv_line
+                csv += format_for_csv(computer_info)
 
             else:
                 # Report on problem agents and appliances
@@ -265,14 +258,7 @@ def get_computer_statuses(api, configuration, api_version, api_exception):
                         computer_info.append("")
 
                     # Add the computer info to the CSV string
-                    csv_line = ""
-                    for num, item in enumerate(computer_info):
-                        csv_line += item
-                        if num != (len(computer_info) - 1):
-                            csv_line += ","
-                        else:
-                            csv_line += "\r\n"
-                    csv += csv_line
+                    csv += format_for_csv(computer_info)
 
                 # Appliance is installed but is not active
                 if computer.appliance_finger_print is not None and appliance_status != "active":
@@ -297,14 +283,7 @@ def get_computer_statuses(api, configuration, api_version, api_exception):
                         computer_info.append("")
 
                     # Add the computer info to the CSV string
-                    csv_line = ""
-                    for num, item in enumerate(computer_info):
-                        csv_line += item
-                        if num != (len(computer_info) - 1):
-                            csv_line += ","
-                        else:
-                            csv_line += "\r\n"
-                    csv += csv_line
+                    csv += format_for_csv(computer_info)
 
         return csv
 
@@ -362,14 +341,7 @@ def get_anti_malware_status_for_computers(api, configuration, api_version, api_e
                 module_info.append(computer.anti_malware.module_status.agent_status_message)
 
                 # Add the module info to the CSV string
-                csv_line = ""
-                for num, item in enumerate(module_info):
-                    csv_line += item
-                    if num != (len(module_info) - 1):
-                        csv_line += ","
-                    else:
-                        csv_line += "\r\n"
-                csv += csv_line
+                csv += format_for_csv(module_info)
 
             # Appliances that are not active for the module
             if appliance_status and appliance_status != "active":
@@ -385,16 +357,86 @@ def get_anti_malware_status_for_computers(api, configuration, api_version, api_e
                 module_info.append(computer.anti_malware.module_status.appliance_status_message)
         
                 # Add the module info to the CSV string
-                csv_line = ""
-                for num, item in enumerate(module_info):
-                    csv_line += item
-                    if num != (len(module_info) - 1):
-                        csv_line += ","
-                    else:
-                        csv_line += "\r\n"
-                csv += csv_line
+                csv += format_for_csv(module_info)
 
         return csv
 
     except api_exception as e:
         return "Exception: " + str(e)
+
+
+def get_date_of_last_recommendation_scan(api, configuration, api_version, api_exception):
+    """For every computer, obtains the date that the last recommendation scan ran and the scan status.
+
+    Returns the information as a list of comma-separated values.
+
+    :param api: The Deep Security API modules.
+    :param configuration: Configuration object to pass to the api client.
+    :param api_version: The version of the API to use.
+    :param api_exception: The Deep Security API exception module.
+    :return: A string that can be saved as a CSV file.
+    """
+
+    import datetime
+
+    # Add the current date and column titles to comma-separated values string
+    csv = datetime.datetime.now().strftime("%Y-%m-%d %H:%M") + "\r\n"
+    csv += "Host Name,Date of Last Scan,Scan Status\r\n"
+
+    # Include minimal information in the returned Computer objects
+    expand = api.Expand(api.Expand.none)
+
+    try:
+        # Get the list of computers and iterate over it
+        computers_api = api.ComputersApi(api.ApiClient(configuration))
+        computers = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
+
+        computer_ips_assignments_recommendations_api = (
+            api.ComputerIntrusionPreventionRuleAssignmentsRecommendationsApi(api.ApiClient(configuration)))
+        for computer in computers.computers:
+            # Get the recommendation scan information
+            intrusion_prevention_assignments = (
+                computer_ips_assignments_recommendations_api.list_intrusion_prevention_rule_ids_on_computer(
+                    computer.id,
+                    api_version,
+                    overrides=False))
+            reco_scan_info = list()
+
+            # Computer name
+            reco_scan_info.append(computer.host_name)
+
+            # Scan date
+            if intrusion_prevention_assignments.last_recommendation_scan_date is not None:
+                d = datetime.datetime.utcfromtimestamp(intrusion_prevention_assignments.last_recommendation_scan_date/1000)
+                reco_scan_info.append(d.strftime('%Y-%m-%d %H:%M:%S'))
+            else:
+                reco_scan_info.append("No scan on record")
+
+            # Scan status
+            reco_scan_info.append(intrusion_prevention_assignments.recommendation_scan_status)
+
+            # Add to the CSV string
+            csv += format_for_csv(reco_scan_info)
+
+        return csv
+
+    except api_exception as e:
+        return "Exception: " + str(e)
+
+
+def format_for_csv(line_item):
+    """Converts a list into a string of comma-separated values, ending with a newline character.
+
+    :param line_item: The list of lists to convert to a string of comma-spearated values
+    :return: A string that can be saved as a CSV file.
+    """
+
+    csv_line = ""
+    for num, item in enumerate(line_item):
+        csv_line += str(item)
+        if num != (len(line_item) - 1):
+            csv_line += ","
+        else:
+            csv_line += "\r\n"
+
+    return csv_line
