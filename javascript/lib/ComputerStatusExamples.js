@@ -21,7 +21,7 @@
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains a string of values in CSV format.
  */
-exports.getComputerStatuses = function (api, apiVersion) {
+exports.getComputerStatuses = function(api, apiVersion) {
   return new Promise((resolve, reject) => {
     // Obtains a list of all computers
     const getListOfComputers = () => {
@@ -103,7 +103,7 @@ exports.getComputerStatuses = function (api, apiVersion) {
   });
 };
 
-exports.getAntiMalwareStatusForComputers = function (api, apiVersion) {
+exports.getAntiMalwareStatusForComputers = function(api, apiVersion) {
   return new Promise((resolve, reject) => {
     // Obtains a list of all computers
     const getListOfComputers = () => {
@@ -195,7 +195,7 @@ function formatForCSV(values) {
  * @return {Promise} A promise that contains on object of Anti-Malware properties.
  */
 
-exports.checkAntiMalware = function (api, computerID, apiVersion) {
+exports.checkAntiMalware = function(api, computerID, apiVersion) {
   return new Promise((resolve, reject) => {
     let amStatus, computer;
 
@@ -263,7 +263,7 @@ function getAntiMalwareInfo(computer) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the rule IDs.
  */
-exports.findRulesForCVE = function (api, cveID, apiVersion) {
+exports.findRulesForCVE = function(api, cveID, apiVersion) {
   const ruleIDs = [];
 
   // Search for Intrusion Prevention rules
@@ -314,7 +314,7 @@ exports.findRulesForCVE = function (api, cveID, apiVersion) {
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains an array of IDs of unprotected computers.
  */
-exports.checkComputersForIPRule = function (api, ruleID, apiVersion) {
+exports.checkComputersForIPRule = function(api, ruleID, apiVersion) {
   return new Promise((resolve, reject) => {
     // Retrieves computers from Deep Security Manager
     const getComputers = () => {
@@ -330,7 +330,7 @@ exports.checkComputersForIPRule = function (api, ruleID, apiVersion) {
     };
 
     // Finds computers that are not assigned the rule
-    const checkForRule = function (computers) {
+    const checkForRule = function(computers) {
       let unprotected = [];
       for (let i = 0; i < computers.computers.length; i++) {
         if (computers.computers[i].intrusionPrevention !== undefined) {
@@ -371,7 +371,7 @@ exports.checkComputersForIPRule = function (api, ruleID, apiVersion) {
  * @return {Promise} A promise that contains the modified policy.
  */
 
-exports.applyRuleToPolicy = function (api, computer, ruleID, apiVersion) {
+exports.applyRuleToPolicy = function(api, computer, ruleID, apiVersion) {
   return new Promise((resolve, reject) => {
     // Retrieves the policy that we are modifying
     const getPolicy = policyID => {
@@ -424,13 +424,13 @@ exports.applyRuleToPolicy = function (api, computer, ruleID, apiVersion) {
 
 /**
  * Obtains the list of recommended Intrusion Prevention rules to apply to a computer,
- * according to the results of the last recommendation scan.* @param {object} api The api module.
+ * according to the results of the last recommendation scan.
  * @param {object} api The api module.
  * @param {Computer} computer The Computer that was scanned.
  * @param {String} apiVersion The api version to use.
  * @return {Promise} A promise that contains the recommended rules.
  */
-exports.getRecommendedIPRules = function (api, computerID, apiVersion) {
+exports.getRecommendedIPRules = function(api, computerID, apiVersion) {
   return new Promise((resolve, reject) => {
     // Obtains the results of the recommendation scan
     const getRecommendations = () => {
@@ -442,6 +442,80 @@ exports.getRecommendedIPRules = function (api, computerID, apiVersion) {
       .then(ipAssignments => {
         // Resolve the recommended rules
         resolve(ipAssignments.assignedRuleIDs);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
+exports.getDateOfLastRecoScan = function(api, apiVersion) {
+  return new Promise((resolve, reject) => {
+    // Obtains a list of all computers
+    const getListOfComputers = () => {
+      const computersApi = new api.ComputersApi();
+
+      // Include mininmal information in returned Computer objects
+      const Options = api.Expand.OptionsEnum;
+      const expand = new api.Expand.Expand(Options.none);
+      const opts = {
+        expand: expand.list(),
+        overrides: false
+      };
+
+      return computersApi.listComputers(apiVersion, opts);
+    };
+
+    // Obtains the Intrusion Prevention recommendation scan information for a computer
+    const getRcommendationScanInfo = computerObj => {
+      return new Promise((resolve, reject) => {
+        // The recommendation scan information is the same for all modules
+        const computerIntrusionPreventionRuleAssignmentsRecommendationsApi = new api.ComputerIntrusionPreventionRuleAssignmentsRecommendationsApi();
+        const opts = {
+          overrides: false
+        };
+        computerIntrusionPreventionRuleAssignmentsRecommendationsApi
+          .listIntrusionPreventionRuleIDsOnComputer(computerObj.ID, apiVersion, opts)
+          .then(intrusionPreventionAssignments => {
+            // Capture the desired recommendation scan information
+            let scanInfo = [];
+            scanInfo.push(computerObj.hostName);
+            if (intrusionPreventionAssignments.lastRecommendationScanDate !== undefined) {
+              scanInfo.push(new Date(intrusionPreventionAssignments.lastRecommendationScanDate).toString());
+            } else {
+              scanInfo.push("No scan on record");
+            }
+            scanInfo.push(intrusionPreventionAssignments.recommendationScanStatus);
+            resolve(scanInfo);
+          })
+          .catch(error => {
+            reject(error);
+          });
+      });
+    };
+
+    // Add current date and column titles to a comma-separated values string
+    const date = new Date(Date.now());
+    let csv = date.getUTCDate() + "-" + date.getUTCMonth() + "-" + date.getUTCFullYear() + "\r\n";
+    csv += "Host Name, Last Scan Date, Scan Status\r\n";
+
+    let scanInfoPromises = []; // Stores promises that getRecommendationScanInfo returns
+
+    // Get all computers and extract the recommendation scan information
+    return getListOfComputers()
+      .then(computers => {
+        for (const computer of computers.computers) {
+          scanInfoPromises.push(getRcommendationScanInfo(computer));
+        }
+        // Continue when all promises are resolved
+        return Promise.all(scanInfoPromises);
+      })
+      .then(allComputersScanInfo => {
+        // Convert to CSV format
+        allComputersScanInfo.forEach(computerScanInfo => {
+          csv += formatForCSV(computerScanInfo);
+        });
+        resolve(csv);
       })
       .catch(error => {
         reject(error);
