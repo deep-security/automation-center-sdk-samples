@@ -34,10 +34,10 @@ defaultClient.basePath = properties.url;
 let DefaultAuthentication = defaultClient.authentications["DefaultAuthentication"];
 DefaultAuthentication.apiKey = properties.secretkey;
 
-//Uncomment to allow connections that are 'secured' with self-signed certificate
+// Uncomment to allow connections that are 'secured' with self-signed certificate
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-//Environment values -- change as needed
+// Environment values -- change as needed
 let auditorRoleId = 2;
 let computerID = 2;
 let policyID = 1;
@@ -434,7 +434,16 @@ ComputerStatusExamples.getComputerStatuses(api, apiVersion)
   .catch(error => {
     console.log(`Error getting computer statuses: ${error}`);
   });
+
+ComputerStatusExamples.getDateOfLastRecoScan(api, apiVersion)
+  .then(csv => {
+    console.log(`Returned recommendation scan information CSV text: ${csv}`);
+  })
+  .catch(error => {
+    console.log(`Error getting recommendation scan information: ${error}`);
+  });
 */
+
 /*
 // ### Computer Override Examples ###
 const ComputerOverrideExamples = require("./lib/ComputerOverrideExamples.js");

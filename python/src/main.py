@@ -113,7 +113,7 @@ relay_list_id = 1
 name = "API Policy"
 
 # computer_id_status_change, rule_id, rule_id_2 & cve_id for Computer Status examples
-computer_id_status_change = 2
+computer_id_status_change = 201
 rule_id = 6104
 rule_id_2 = 5930
 cve_id = "CVE-2016-7214"
@@ -483,6 +483,12 @@ def main():
             api, configuration, api_version, api_exception))
     )
     """
+
+    print(
+        "Displaying results from computer_status_examples.get_date_of_last_recommendation_scan:\n" +
+        str(computer_status_examples.get_date_of_last_recommendation_scan(
+            api, configuration, api_version, api_exception))
+    )
 
     # Common Objects examples
     """
