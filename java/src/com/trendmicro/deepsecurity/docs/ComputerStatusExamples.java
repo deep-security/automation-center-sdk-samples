@@ -16,6 +16,9 @@
 
 package com.trendmicro.deepsecurity.docs;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,7 +66,7 @@ public class ComputerStatusExamples {
 
 		// Add column titles to comma-separated values
 		StringBuilder csv = new StringBuilder("Host Name, Agent or Appliance, Status, Status Messages, Tasks\r\n");
-		
+
 		// Include computer status information in the returned Computer objects
 		Expand expand = new Expand(Expand.OptionsEnum.COMPUTER_STATUS);
 
@@ -166,7 +169,7 @@ public class ComputerStatusExamples {
 
 		// Add titles to comma-separated values
 		StringBuilder csv = new StringBuilder("Host Name, Module State, Agent or Appliance, Status, Status Message\r\n ");
-		
+
 		// Include Anti-Malware information in the returned Computer objects
 		Expand expand = new Expand(Expand.OptionsEnum.ANTI_MALWARE);
 
@@ -234,7 +237,7 @@ public class ComputerStatusExamples {
 
 		ComputersApi computersApi = new ComputersApi();
 		AntiMalwareConfigurationsApi amConfigApi = new AntiMalwareConfigurationsApi();
-		
+
 		// Include Anti-Malware information in the returned Computer objects
 		Expand expand = new Expand(Expand.OptionsEnum.ANTI_MALWARE, Expand.OptionsEnum.COMPUTER_SETTINGS);
 
@@ -312,7 +315,7 @@ public class ComputerStatusExamples {
 	public static Computers checkComputersForIPRule(Integer ruleID, String apiVersion) throws ApiException {
 		Computers needsRule = new Computers();
 		ComputersApi computersApi = new ComputersApi();
-		
+
 		// Include Intrusion Prevention information in the returned Computer objects
 		Expand expand = new Expand(Expand.OptionsEnum.INTRUSION_PREVENTION);
 
@@ -383,5 +386,56 @@ public class ComputerStatusExamples {
 		ipAssignments = ipRecosApi.listIntrusionPreventionRuleIDsOnComputer(computerID, Boolean.FALSE, apiVersion);
 
 		return ipAssignments.getRecommendedToAssignRuleIDs();
+	}
+
+	/**
+	 * For all computers, obtains the date of the last recommendation scan and the scan status.
+	 * 
+	 * @param apiVersion The version of the API to use.
+	 * @throws ApiException if a problem occurs when getting the list of computers and recommended rules.
+	 * @return A String that contains the recommendation scan information for all computers, in CSV format.
+	 */
+	public static String getDateOfLastRecommendationScan(String apiVersion) throws ApiException {
+
+		// Add the current date to the report
+		StringBuilder csv = new StringBuilder(LocalDateTime.now().toString() + "\r\n");
+
+		// Add column titles to comma-separated values
+		csv.append("Host Name, Last Scan Date, Scan Status\r\n");
+
+		// Include minimal information in the returned Computer objects
+		Expand expand = new Expand(Expand.OptionsEnum.NONE);
+
+		// Get all computers
+		ComputersApi computersApi = new ComputersApi();
+		Computers computers = computersApi.listComputers(expand.list(), Boolean.FALSE, apiVersion);
+
+		for (Computer computer : computers.getComputers()) {
+			List<String> recoScanInfo = new ArrayList<>();
+
+			// Capture the host name
+			recoScanInfo.add(computer.getHostName());
+			
+			// Get the recommendation scan information
+			ComputerIntrusionPreventionRuleAssignmentsRecommendationsApi ipRulesRecApi = new ComputerIntrusionPreventionRuleAssignmentsRecommendationsApi();
+			Boolean overrides = Boolean.FALSE;
+			IntrusionPreventionAssignments ipAssignments = ipRulesRecApi.listIntrusionPreventionRuleIDsOnComputer(computer.getID(), overrides, apiVersion);
+
+			// Last scan date
+			if (ipAssignments.getLastRecommendationScanDate() != null) {
+				Long lastScanSinceEpoch = ipAssignments.getLastRecommendationScanDate();
+				LocalDateTime lastScanUTC = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastScanSinceEpoch.longValue()), ZoneOffset.UTC);
+				recoScanInfo.add(lastScanUTC.toString());
+			} else {
+				recoScanInfo.add("No scan on record");
+			}
+			
+			// Scan status
+			recoScanInfo.add(ipAssignments.getRecommendationScanStatus().getValue());
+			
+			// Add to the CSV string
+			csv.append(formatForCSV(recoScanInfo));
+		}
+		return csv.toString();
 	}
 }
