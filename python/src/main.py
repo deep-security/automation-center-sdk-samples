@@ -223,12 +223,12 @@ def main():
     """
 
     # Computer Overrides examples
+    """
     print(
         "Displaying results from computer_override_examples.override_reconnaissance_scan:\n" +
         str(computer_override_examples.override_reconnaissance_scan(
             api, configuration, api_version, api_exception, override_computer_id))
     )
-    """
 
     print(
         "Displaying results from computer_override_examples.get_computer_overrides:\n" +
@@ -436,6 +436,11 @@ def main():
         str(search_examples.search_computers_by_aws_account(
             api, configuration, api_version, api_exception, "my aws account ID"))
     )
+    print(
+        "Displaying results from search_examples.search_computers_not_updated:\n" +
+        str(search_examples.search_computers_not_updated(
+            api, configuration, api_version, api_exception))
+    )
     """
 
     # Computer Status examples
@@ -482,13 +487,13 @@ def main():
         str(computer_status_examples.get_anti_malware_status_for_computers(
             api, configuration, api_version, api_exception))
     )
-    """
 
     print(
         "Displaying results from computer_status_examples.get_date_of_last_recommendation_scan:\n" +
         str(computer_status_examples.get_date_of_last_recommendation_scan(
             api, configuration, api_version, api_exception))
     )
+    """
 
     # Common Objects examples
     """

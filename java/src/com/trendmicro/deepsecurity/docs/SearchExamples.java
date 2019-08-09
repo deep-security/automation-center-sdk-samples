@@ -209,4 +209,30 @@ public class SearchExamples {
 		ComputersApi computersApi = new ComputersApi();
 		return computersApi.searchComputers(searchFilter, expand.list(), Boolean.FALSE, apiVersion);
 	}
+	/**
+	 * Search for computers that have not had their policy updated.
+	 * Demonstrates a search for a null value.
+	 * 
+	 * @param apiVersion The version of the API to use.
+	 * @throws ApiException if a problem occurs when searching.
+	 * @returns A Computers object that contains matching computers.
+	 */
+	public static Computers searchComputersNotUpdated(String apiVersion) throws ApiException {
+		
+		//Search criteria for the lastSendPolicySuccess field
+		SearchCriteria computerCriteria = new SearchCriteria();
+		computerCriteria.setFieldName("lastSendPolicySuccess");
+		computerCriteria.setNullTest(Boolean.TRUE);
+
+		// Search filter
+		SearchFilter searchFilter = new SearchFilter();
+		searchFilter.addSearchCriteriaItem(computerCriteria);
+
+		// Include minimal information in the returned computer objects 
+		Expand expand = new Expand();
+		expand.add(Expand.OptionsEnum.NONE);
+
+		ComputersApi computersApi = new ComputersApi();
+		return computersApi.searchComputers(searchFilter, expand.list(), Boolean.FALSE, apiVersion);
+	}
 }
