@@ -240,3 +240,35 @@ exports.searchComputersByAwsAccount = function(api, accountID, apiVersion) {
   const computersApi = new api.ComputersApi();
   return computersApi.searchComputers(apiVersion, searchOptions);
 };
+
+/**
+ * Searches for computers that have not had their policy updated.
+ * Demonstrates searching for a null value.
+ * @param {object} api The api module.
+ * @param {String} apiVersion The api version to use.
+ * @return {Promise} A promise that contains the found computers.
+ */
+exports.searchComputersNotUpdated = function(api, apiVersion) {
+  // Search criteria
+  const searchCriteria = new api.SearchCriteria();
+  searchCriteria.fieldName = "lastSendPolicySuccess";
+  searchCriteria.nullTest = true;
+
+  // Add criteria to search filter
+  const searchFilter = new api.SearchFilter();
+  searchFilter.searchCriteria = [searchCriteria];
+
+  // Include minimal information in the returned computers
+  const expand = new api.Expand.Expand(api.Expand.OptionsEnum.none);
+
+  // Search options object
+  const searchOptions = {
+    searchFilter: searchFilter,
+    expand: expand.list(),
+    overrides: false
+  };
+
+  // Perform the search
+  const computersApi = new api.ComputersApi();
+  return computersApi.searchComputers(apiVersion, searchOptions);
+};

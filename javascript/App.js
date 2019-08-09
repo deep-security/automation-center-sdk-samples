@@ -521,6 +521,14 @@ SearchExamples.searchComputersByAwsAccount(api, "my AWS account ID", apiVersion)
   .catch(error => {
     console.log(`Error searching Computers by AWS account: ${error}`);
   });
+
+SearchExamples.searchComputersNotUpdated(api, apiVersion)
+  .then(searchResults => {
+    console.log(`Found ${searchResults.computers.length} computers that have not been udpated.`);
+  })
+  .catch(error => {
+    console.log(`Error searching Computers by AWS account: ${error}`);
+  });
 */
 /*
 // ### Tenant examples ###
