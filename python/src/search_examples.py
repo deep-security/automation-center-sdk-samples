@@ -208,3 +208,35 @@ def search_computers_by_aws_account(api, configuration, api_version, api_excepti
 
     except api_exception as e:
         return "Exception: " + str(e)
+
+
+def search_computers_not_updated(api, configuration, api_version, api_exception):
+    """ Search for computers that have not had their policy updated.
+    Demonstrates searching for a null value.
+
+    :param api: The Deep Security API modules.
+    :param configuration: Configuration object to pass to the api client.
+    :param api_version: The version of the API to use.
+    :param api_exception: The Deep Security API exception module.
+    :return: A Computers object that contains matching computers
+    """
+
+    # Search criteria
+    computer_criteria = api.SearchCriteria()
+    computer_criteria.field_name = "lastSendPolicySuccess"
+    computer_criteria.null_test = True
+
+    # Search filter
+    max_items = None
+    search_filter = api.SearchFilter(max_items, computer_criteria)
+
+    # Include minimal information in the returned computers
+    expand = api.Expand(api.Expand.none)
+
+    try:
+        # Perform the search
+        computers_api = api.ComputersApi(api.ApiClient(configuration))
+        return computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
+
+    except api_exception as e:
+        return "Exception: " + str(e)
