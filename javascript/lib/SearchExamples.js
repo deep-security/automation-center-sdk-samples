@@ -140,19 +140,21 @@ exports.pagedSearchComputers = function(api, apiVersion) {
     function getPageOfComputers(pageSearchOptions) {
       // Checks the search results to see if we're done
       function checkResults(searchResults) {
-        // Get the ID of the last computer found, and the number found
-        const lastID = searchResults.computers[searchResults.computers.length - 1].ID;
         const numFound = searchResults.computers.length;
+
+        // If the number found is zero we are done
+        if (numFound == 0) {
+          return results;
+        }
+
+        // Get the ID of the last computer found, and the number found
+        const lastID = searchResults.computers[numFound - 1].ID;
 
         // Uncomment to see the page details as they are obtained
         //console.log(`last ID:  ${lastID}; numfound: ${numFound}`);
 
         results.push(searchResults.computers);
 
-        // If the number found is less than the page size we are done
-        if (numFound < pageSize) {
-          return results;
-        }
         // Search filter for the next page of computers
         const nextSearchCriteria = new api.SearchCriteria();
         nextSearchCriteria.idValue = lastID;
