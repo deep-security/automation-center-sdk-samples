@@ -144,7 +144,7 @@ public class SearchExamples {
 				Integer lastID = computers.getComputers().get(computers.getComputers().size() - 1).getID();
 				searchCriteria.setIdValue(Long.valueOf(lastID.toString()));
 			}
-		} while (found == pageSize.intValue()); // Exit loop when the page size is less than the maximum
+		} while (found > 0); // Exit loop when no computers are found
 	}
 
 	/**
