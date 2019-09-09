@@ -129,9 +129,6 @@ def paged_search_computers(api, configuration, api_version, api_exception):
             search_criteria.id_value = last_id
             print("Last ID: " + str(last_id), "Computers found: " + str(num_found))
 
-            if num_found != page_size:
-                break
-
         return paged_computers
 
     except api_exception as e:
