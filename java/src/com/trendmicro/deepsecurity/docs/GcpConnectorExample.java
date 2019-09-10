@@ -48,7 +48,7 @@ public class GcpConnectorExample {
 	 * @throws ApiException if a problem occurs when creating a gcp connector on
 	 *                      Deep Security Manager.
 	 */
-	public static Action submitGCPConnectorSyncAction(Integer gcpConnectorID, String apiVersion) throws ApiException {
+	public static Action createGCPConnectorAction(Integer gcpConnectorID, String apiVersion) throws ApiException {
 		
 		GcpConnectorActionsApi apiInstance = new GcpConnectorActionsApi();
 		//setup synchronize action
