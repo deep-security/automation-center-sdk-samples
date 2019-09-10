@@ -16,16 +16,16 @@
 
 /**
  * Create a GCP connector.
- * @param {ApiClient} api The Deep Security API exports.
- * @param {String} name The name of gcpconnector.
- * @param {String} serviceAccount The service account of gcpconnector.
- * @param {String} apiVersion The api version to use.
- * @returns {Promise} A promise contains GCP Connector object.
+ * @param {ApiClient} api           The Deep Security API exports.
+ * @param {String} name             The name of the GCP connector.
+ * @param {String} serviceAccount   The GCP service account used by the GCP connector.
+ * @param {String} apiVersion       The API version to use.
+ * @returns {Promise}               The promise containing the GCP connector object.
  */
 exports.createGcpConnector = function(api, name, serviceAccount, apiVersion){
     let apiInstance = new api.GCPConnectorsApi();
     let gcpConnector = new api.GCPConnector();
-    // Set Gcp connector properties.
+    // Set the GCP connector properties.
     gcpConnector.name = name;
     gcpConnector.serviceAccount = serviceAccount;
     return apiInstance.createGCPConnector(gcpConnector, apiVersion);
@@ -33,13 +33,13 @@ exports.createGcpConnector = function(api, name, serviceAccount, apiVersion){
 
 /**
  * Submit a synchronize action of a GCP connector by ID.
- * @param {ApiClient} api The Deep Security API exports.
- * @param {Number} gcpConnectorID The ID of the gcpconnector.
- * @returns {Promise} A promise contains GCP Connector object.
+ * @param {ApiClient} api           The Deep Security API exports.
+ * @param {Number} gcpConnectorID   The ID of the GCP connector.
+ * @returns {Promise}               The promise containing the GCP connector object.
  */
-exports.submitGcpConnectorAction = function(api, gcpConnectorID, apiVersion){
+exports.createGcpConnectorAction = function(api, gcpConnectorID, apiVersion){
     let apiInstance = new api.GCPConnectorActionsApi();
-    // Set Action
+    // Set the action.
     let gcpConnectorAction = new api.Action();
     gcpConnectorAction.type = "synchronize";
     return apiInstance.createGCPConnectorAction(gcpConnectorID, gcpConnectorAction, apiVersion);
