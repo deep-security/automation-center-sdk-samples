@@ -41,6 +41,7 @@ import computer_override_examples
 import scheduled_task_examples
 import role_examples
 import rate_limit_examples
+import gcpconnector_example
 
 # Uncomment to allow connections that are 'secured' with self-signed certificate
 # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -162,6 +163,10 @@ max_sessions = 10
 max_sessions_exceeded_action = "Block new sessions"
 allow_agent_initiated_activation = 0
 
+# For GCP connector example only
+gcpconnector_name = "SDK_TEST"
+# This service account is for Deep Security SDK test only do not distribute for other usages.
+service_account = "<base64-encoded-gcp-service-account-key>"
 
 def main():
 
@@ -570,6 +575,33 @@ def main():
     )
     """
 
+    # GCP Connector example
+    """
+    # Create a GCP Connector
+    gcpconnector = gcpconnector_example.create_gcp_connector(
+        api, configuration, api_version, api_exception, gcpconnector_name, service_account)
+    print(
+        "Create GCP Connector from gcpconnector_examples.create_gcp_connector\n" +
+        str(gcpconnector)
+    )
+
+    # Submit a sync action to a GCP Connector
+    gcpconnector_action = api.Action()
+    gcpconnector_action = gcpconnector_example.submit_gcp_connector_sync_action(
+        api, configuration, api_version, api_exception, gcpconnector.id)
+    print(
+        "Submit a sync action to a  GCP Connector from gcpconnector_examples.submit_gcp_connector_sync_action\n" +
+        str(gcpconnector_action)
+    )
+
+    # CleanUp
+    # Delete a GCP Connector
+    api_instance = api.GCPConnectorsApi(api.ApiClient(configuration))
+    api_instance.delete_gcp_connector(gcpconnector.id, api_version)
+    print(
+        "Delete GCP Connector\n"
+    )
+    """
 
 if __name__ == '__main__':
     main()

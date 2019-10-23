@@ -59,4 +59,4 @@ def submit_gcp_connector_sync_action(api, configuration, api_version, api_except
         api_response = api_instance.create_gcp_connector_action(gcp_connector_id, gcp_connector_action, api_version)
         return api_response
     except api_exception as e:
-        print("An exception occurred when calling GCPConnectorActionsApi.create_google_connector_action: %s\n" % e)
+        print("An exception occurred when calling GCPConectorActionsDetailsApi.create_google_connector_action: %s\n" % e)

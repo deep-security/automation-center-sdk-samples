@@ -71,6 +71,34 @@ FirstStepsPostExample.searchFirewallRules(properties.url, properties.secretkey)
     console.log(`Error searching for Firewall rules: ${error}`);
   });
 
+// ### GCP connector Examples ###
+/*
+const GcpconnectorExample = require("./lib/GcpconnectorExample.js");
+const connectorName = "SDKTEST"
+// This service account is for Deep Security SDK test only do not distribute for other usages.
+const serviceAccount = "<base64-encoded-gcp-service-account-key>"
+
+const deleteGcpConnector = (gcpConnectorID, apiVersion) => {
+  apiInstance = new api.GCPConnectorsApi;
+  return apiInstance.deleteGCPConnector(gcpConnectorID, apiVersion);
+};
+
+async function testGcpconnectorSDK(){
+  // Create a GCP connector.
+  var gcpconnector = await GcpconnectorExample.createGcpConnector(api, connectorName, serviceAccount, apiVersion);
+  console.log(`API createGcpConnector called successfully. Returned data: ${JSON.stringify(gcpconnector, null, 4)}`);
+
+  // Submit a synchronize action.
+  var action = await GcpconnectorExample.submitGcpConnectorAction(api, gcpconnector.ID, apiVersion);
+  console.log(`API submitGcpConnectorAction called successfully. Returned data: ${JSON.stringify(action, null, 4)}`);
+
+  //CleanUp
+  await deleteGcpConnector(gcpconnector.ID, apiVersion);
+}
+
+testGcpconnectorSDK();
+*/
+
 /*
 // ### API Rate Limit examples ###
 const RateLimitExamples = require("./lib/RateLimitExamples.js");
