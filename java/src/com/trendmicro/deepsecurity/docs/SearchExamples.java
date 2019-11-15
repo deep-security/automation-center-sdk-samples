@@ -156,7 +156,7 @@ public class SearchExamples {
 	 * @throws ApiException if a problem occurs when searching.
 	 * @returns A Computers object that contains matching computers.
 	 */
-	public static Computers getComputersWithPolicyAndRelayList(Long relayListID, Long policyID, String apiVersion) throws ApiException {
+	public static Computers getComputersWithPolicyAndRelayList(Double relayListID, Double policyID, String apiVersion) throws ApiException {
 
 		// Search criteria for platform
 		SearchCriteria relayCrit = new SearchCriteria();
