@@ -82,7 +82,7 @@ public class ApplicationControlExamples {
 		SearchCriteria computerCriteria = new SearchCriteria();
 		computerCriteria.setFieldName("computerID");
 		computerCriteria.setNumericTest(NumericTestEnum.EQUAL);
-		computerCriteria.setNumericValue(Long.valueOf(computerId.longValue()));
+		computerCriteria.setNumericValue(computerId.doubleValue());
 
 		// Search filter
 		SearchFilter searchFilter = new SearchFilter();
