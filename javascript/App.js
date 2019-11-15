@@ -71,6 +71,34 @@ FirstStepsPostExample.searchFirewallRules(properties.url, properties.secretkey)
     console.log(`Error searching for Firewall rules: ${error}`);
   });
 
+// ### GCP connector Examples ###
+/*
+const GcpconnectorExample = require("./lib/GcpconnectorExample.js");
+const connectorName = "SDKTEST"
+// This service account is for Deep Security SDK test only do not distribute for other usages.
+const serviceAccount = "ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsCiAgInByb2plY3RfaWQiOiAic2FwcGhpcmV0ZXN0MSIsCiAgInByaXZhdGVfa2V5X2lkIjogImU2ODMwMjNhZTIyZjcxZjZiNjk5ZTBlYTQ5Mjk0NzJiY2JiZGI3ZDgiLAogICJwcml2YXRlX2tleSI6ICItLS0tLUJFR0lOIFBSSVZBVEUgS0VZLS0tLS1cbk1JSUV2QUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktZd2dnU2lBZ0VBQW9JQkFRQzQ4elRlVEt0TkoyNVlcbjUrOFc3MzEwY2paeW95b0h0eDFqVnpIdC8rVlZJb2RDakNiS1Q1aTEyNUN4Sll3SDhuN0JIZjZQWWFxenhmNVRcbnhoRkphMkZDQldCeVFGQnZOWlQ3TG42SU1mMXB4M085VmdTeTJNSFVFeGFnNGgrVlpUVEpiY21LQ3JyZ1d3RWVcbmpMaWlPaDhTaTIvSVMzejZ3L2tEN1c0cTRXTVdTRG43b0xtcW9YMjdKWUF0YkVPZ2xwT242bThDVUVaLzNucFhcbmJwWnBpa0hUdzhGaHVvaVNyRHV2UzhWV1JGLzBPbnJKODBrS25RYUM4bnJwMEFXcUxLUnJXY05rSjJiOTZVeGRcbjk4WlkxMmc4NDU1QUlpSFdWbkNRMnRQOHZjV2ZsUTEwdHl6Q2E3cS9UNjV4M3l4S3hoNGZWS0xFL2docGlPNzdcbkR5cVJPRTFUQWdNQkFBRUNnZ0VBRzFuOFM1UFRFWW52Uzc2aElTY3h5bkxKa3BLR3VMVmY1ejBSNlR5YTBjaFZcbmNJWUJocEhXNTY0YzY5VzlxNzgwOTZKVDd5aG1ja2Vwb1FIOXRIbm8zRGFuV0w0aUp4QXBoQ3dRRWx3eU9kNkJcblExTGhSd0cvU0htNk12aTk2djRZbkdGY0dNb1ZjUENFYmR3cHdmUU9mRk9hcUdoaGgwUk1JMFNOc2xHNnNhU2tcblFSL0JzK0ZwWmh2aHJ3eC9ncGVQN1M1Z1l4djg1QlAwYllQYW9keWhiZzJIdVd1bzZoTkEvQVNvTGNGbnBmU0hcbmU3Yjd1ZXZZVURIS0NoS01zRHI5RDkrY0VoOXVxT24wQ2w4ZjhQNXYwcnJQRmt0T1NHUTdhRGU5MGN0NEpBM0RcbmxaQjhrL1JmWXN6KzRCazFSbnd2TVVPRjhkc0RRcjFreUVKZlVuK1hRUUtCZ1FEckg0WFlvamNMam5IQk51VVBcbnBEMkxJQmhqZFlLeVNpbXo0Nng0Tmx0M2pRczVYVXlEZ3F6S3NPY1l5Sk1Kb0dtVUI0VU5jdmFPR2h5aGIxS0JcbkcwK3NJVjZzWThudFBTaWtSajVnV3JnaVR3M0JEZ0o4TzRoRGNRWGV2RE5OM2dWdEhJSG1SRXdKSEk5YVJCU1Rcblg0N1JLM1MxVGxwMUlGNG5GRWM5NTYzbytRS0JnUURKWHppMFdjcjY1MXZ6N0luODlzWEtZdUxvaWd2UEtiNnhcbmZtd0JoYmZYbjVwNmhYTWltWTRaYlBoRWhxMS9JSGFpZ0I3THJrV0d4d1g0QkNSZzRSSVViRXo1S1VRMEhpSjNcbmxyNFhmUTQ5dzByOGk4TEMvQXZpTkNQVDdqUEh2N2J3Y3JtMWhnWFRkNGRXUTFlM0NkRXh3dUtYQUg0SjQ1MitcbnhZV3d1NzNucXdLQmdGTWoxR3BrQWQ3ZVFhODJ3QXlsNFBVL0ppQ1ZQdC9ZaGFLTWtVSDR4cU1oaHFTRUx6Z1pcbmp3d2xQYkp2eWo2UE1JWWRtcGpFM0JZbmVaUkVEd0tFSzhvTUNyUWVuUnA4azlCeTNqK29GSkJkTDluaUlGTFpcbm9qZG0wZEtPN2YxTTB0SmdVRGFpVTlpczlxdk9neEFSckNpZW15ZzVTcGM4R003c3hyeEhIaUhSQW9HQU80RTlcbjJsMW1VN29tTy9BNzNscDFuQmFZZ3FxNFRxRkJUbVhUT0tmdzZYQ3FUMlk3M1krT3BBakZYRXFIM2pjVGwzVlFcbnBGTjlEQlNudU9CUWQ2aEtsV3BqWElWTE9ETm5iL3RGZE45cFkrcmZyNzBFOG1WVWhhVnVxT09Ndll2elhSNHBcbnJuQktMSEQzdHcvelRZMURHZmRDeWVoRlZsckNkR3NkMUZuR0JqMENnWUF4eUw2U3c4elhieVZoK2I4ZHpseWRcblhuSkYrNDVPVHNnczRQcytMMUQwMUxDRHdFZTZaQ0dLaHUzNUpVRFIrc0pEREJ2VGlKWU15cWYzUEZrbjV3VXlcblkyQlpsU0FKN0FDUWM5ZENwVkE0MVNTYnVWQjA5ZDBZNUM1WFpucTBiNElQSWxjTVMvUFB0a1FrbGpTSUNRbVNcbmduaDhidGljOWF1ZEdHd2dJWlM0Z0E9PVxuLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLVxuIiwKICAiY2xpZW50X2VtYWlsIjogIjUwMDkxOTgxNDAyNC1jb21wdXRlQGRldmVsb3Blci5nc2VydmljZWFjY291bnQuY29tIiwKICAiY2xpZW50X2lkIjogIjEwNDY3NjM4MzEwMDYzNDQ0MDg0NSIsCiAgImF1dGhfdXJpIjogImh0dHBzOi8vYWNjb3VudHMuZ29vZ2xlLmNvbS9vL29hdXRoMi9hdXRoIiwKICAidG9rZW5fdXJpIjogImh0dHBzOi8vb2F1dGgyLmdvb2dsZWFwaXMuY29tL3Rva2VuIiwKICAiYXV0aF9wcm92aWRlcl94NTA5X2NlcnRfdXJsIjogImh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL29hdXRoMi92MS9jZXJ0cyIsCiAgImNsaWVudF94NTA5X2NlcnRfdXJsIjogImh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL3JvYm90L3YxL21ldGFkYXRhL3g1MDkvNTAwOTE5ODE0MDI0LWNvbXB1dGUlNDBkZXZlbG9wZXIuZ3NlcnZpY2VhY2NvdW50LmNvbSIKfQo="
+
+const deleteGcpConnector = (gcpConnectorID, apiVersion) => {
+  apiInstance = new api.GCPConnectorsApi;
+  return apiInstance.deleteGCPConnector(gcpConnectorID, apiVersion);
+};
+
+async function testGcpconnectorSDK(){
+  // Create a GCP connector.
+  var gcpconnector = await GcpconnectorExample.createGcpConnector(api, connectorName, serviceAccount, apiVersion);
+  console.log(`API createGcpConnector called successfully. Returned data: ${JSON.stringify(gcpconnector, null, 4)}`);
+
+  // Submit a synchronize action.
+  var action = await GcpconnectorExample.submitGcpConnectorAction(api, gcpconnector.ID, apiVersion);
+  console.log(`API submitGcpConnectorAction called successfully. Returned data: ${JSON.stringify(action, null, 4)}`);
+
+  //CleanUp
+  await deleteGcpConnector(gcpconnector.ID, apiVersion);
+}
+
+testGcpconnectorSDK();
+*/
+
 /*
 // ### API Rate Limit examples ###
 const RateLimitExamples = require("./lib/RateLimitExamples.js");
@@ -156,6 +184,18 @@ ScheduledTaskExamples.createDiscoverComputersScheduledTask(api, apiVersion)
   })
   .catch(error => {
     console.log(`Error running scheduled task examples: ${error}`);
+  });
+*/
+/*
+// ### Registry Scanner Examples ###
+const RegistryScannerExamples = require("./lib/RegistryScannerExamples.js");
+
+RegistryScannerExamples.createRegistryScanner(api, apiVersion, "testSmartCheck", "https://79fd1f6d-f634-417c-bf5b-dec0ccc5877d.mock.pstmn.io", "admin", "password")
+  .then(rsID => {
+    console.log(`Created Registry Scanner ${rsID}`);
+  })
+  .catch(error => {
+    console.log(`Error creating registry scanner: ${error}`);
   });
 */
 /*
@@ -422,6 +462,18 @@ ComputerStatusExamples.getRecommendedIPRules(api, computerID, apiVersion)
   })
   .catch(error => {
     console.log(`Error getting recommnened Intrusion Prevention rules: ${error}`);
+  });
+*/
+/*
+// ### Container Control Examples ###
+const ContainerControlExample = require("./lib/ContainerControlExample.js");
+
+ContainerControlExample.configureContainerControl(api, policyID, apiVersion)
+  .then(modifiedPolicyID => {
+    console.log(`Policy ${modifiedPolicyID} has Container Control state ${modifiedPolicy.containerControl.state}`);
+  })
+  .catch(error => {
+    console.log(`Error setting Container Control state: ${error}`);
   });
 */
 /*
