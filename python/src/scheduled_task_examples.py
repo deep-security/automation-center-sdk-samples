@@ -23,28 +23,23 @@ def create_daily_schedule_details(api, api_exception, custom_interval, start_tim
     :return: A ScheduleDetails object.
     """
 
-    try:
-        # Create a ScheduleDetails object and set the recurrence type
-        daily_schedule = api.ScheduleDetails()
-        daily_schedule.recurrence_type = "daily"
+    # Create a ScheduleDetails object and set the recurrence type
+    daily_schedule = api.ScheduleDetails()
+    daily_schedule.recurrence_type = "daily"
 
-        # Specify when the task runs
-        daily_schedule_parameters = api.DailyScheduleParameters()
+    # Specify when the task runs
+    daily_schedule_parameters = api.DailyScheduleParameters()
 
-        # Use a custom frequency type to run the task at daily intervals.
-        # Every day and only weekdays are other available frequency types.
-        daily_schedule_parameters.frequency_type = "custom"
-        daily_schedule_parameters.custom_interval = custom_interval
-        daily_schedule_parameters.start_time = start_time
+    # Use a custom frequency type to run the task at daily intervals.
+    # Every day and only weekdays are other available frequency types.
+    daily_schedule_parameters.frequency_type = "custom"
+    daily_schedule_parameters.custom_interval = custom_interval
+    daily_schedule_parameters.start_time = start_time
 
-        # Add the schedule parameters to the schedule details
-        daily_schedule.daily_schedule_parameters = daily_schedule_parameters
+    # Add the schedule parameters to the schedule details
+    daily_schedule.daily_schedule_parameters = daily_schedule_parameters
 
-        return daily_schedule
-
-    except api_exception as e:
-        return "Exception: " + str(e)
-
+    return daily_schedule
 
 
 def create_quarterly_schedule_details(api, api_exception, day):
@@ -56,32 +51,27 @@ def create_quarterly_schedule_details(api, api_exception, day):
     :return: A ScheduleDetails object.
     """
 
-    try:
-        # Create a ScheduleDetails object and set the recurrence type
-        quarterly_schedule = api.ScheduleDetails()
-        quarterly_schedule.recurrence_type = "monthly"
+    # Create a ScheduleDetails object and set the recurrence type
+    quarterly_schedule = api.ScheduleDetails()
+    quarterly_schedule.recurrence_type = "monthly"
 
-        # Specify when the task runs
-        monthly_schedule_parameters = api.MonthlyScheduleParameters()
+    # Specify when the task runs
+    monthly_schedule_parameters = api.MonthlyScheduleParameters()
 
-        # Set the schedule to run on a specific day of the month.
-        # Other options are the last day of the month, or a specific weekday of a specific week
-        monthly_schedule_parameters.frequency_type = "day-of-month"
+    # Set the schedule to run on a specific day of the month.
+    # Other options are the last day of the month, or a specific weekday of a specific week
+    monthly_schedule_parameters.frequency_type = "day-of-month"
 
-		# Set the day
-        monthly_schedule_parameters.day_of_month = day
+    # Set the day
+    monthly_schedule_parameters.day_of_month = day
 
-        # Set the months to be quarterly
-        monthly_schedule_parameters.months = ["january", "april", "july", "october"]
+    # Set the months to be quarterly
+    monthly_schedule_parameters.months = ["january", "april", "july", "october"]
 
-        # Add the schedule parameters to the schedule details
-        quarterly_schedule.monthly_schedule_parameters = monthly_schedule_parameters
+    # Add the schedule parameters to the schedule details
+    quarterly_schedule.monthly_schedule_parameters = monthly_schedule_parameters
 
-        return quarterly_schedule
-
-    except api_exception as e:
-        return "Exception: " + str(e)
-
+    return quarterly_schedule
 
 
 def create_discover_computers_scheduled_task(api, configuration, api_version, api_exception):
@@ -114,16 +104,11 @@ def create_discover_computers_scheduled_task(api, configuration, api_version, ap
     task_parameters.scan_discovered_computers = True
     discover_computer_task.discover_computers_task_parameters = task_parameters
 
-    try:
-        # Create the scheduled task on Deep Security Manager
-        scheduled_tasks_api = api.ScheduledTasksApi(api.ApiClient(configuration))
-        scheduled_task = scheduled_tasks_api.create_scheduled_task(discover_computer_task, api_version)
+    # Create the scheduled task on Deep Security Manager
+    scheduled_tasks_api = api.ScheduledTasksApi(api.ApiClient(configuration))
+    scheduled_task = scheduled_tasks_api.create_scheduled_task(discover_computer_task, api_version)
 
-        return "The scheduled task ID is " + str(scheduled_task.id)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
-
+    return scheduled_task.id
 
 
 def check_for_security_updates_using_scheduled_task(api, configuration, api_version, api_exception):
@@ -169,16 +154,11 @@ def check_for_security_updates_using_scheduled_task(api, configuration, api_vers
 
     check_for_security_updates.check_for_security_updates_task_parameters = task_parameters
 
-    try:
-        # Create the scheduled task on Deep Security Manager
-        scheduled_tasks_api = api.ScheduledTasksApi(api.ApiClient(configuration))
-        scheduled_task = scheduled_tasks_api.create_scheduled_task(check_for_security_updates, api_version)
+    # Create the scheduled task on Deep Security Manager
+    scheduled_tasks_api = api.ScheduledTasksApi(api.ApiClient(configuration))
+    scheduled_task = scheduled_tasks_api.create_scheduled_task(check_for_security_updates, api_version)
 
-        return "The scheduled task ID is " + str(scheduled_task.id)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
-
+    return scheduled_task.id
 
 
 def run_scheduled_task(api, configuration, api_version, api_exception, scheduled_task_id):
@@ -192,15 +172,11 @@ def run_scheduled_task(api, configuration, api_version, api_exception, scheduled
     :return: The modified ScheduledTasksApi object.
     """
 
-    try:
-        # Create the ScheduledTask object and set to run now
-        scheduled_task = api.ScheduledTask()
-        scheduled_task.run_now = True
+    # Create the ScheduledTask object and set to run now
+    scheduled_task = api.ScheduledTask()
+    scheduled_task.run_now = True
 
-        # Modify the scheduled task on Deep Security Manager
-        scheduled_tasks_api = api.ScheduledTasksApi(api.ApiClient(configuration))
+    # Modify the scheduled task on Deep Security Manager
+    scheduled_tasks_api = api.ScheduledTasksApi(api.ApiClient(configuration))
 
-        return scheduled_tasks_api.modify_scheduled_task(scheduled_task_id, scheduled_task, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return scheduled_tasks_api.modify_scheduled_task(scheduled_task_id, scheduled_task, api_version)

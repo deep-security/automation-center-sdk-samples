@@ -31,6 +31,7 @@ import com.trendmicro.deepsecurity.model.ApplicationControlGlobalRule;
 import com.trendmicro.deepsecurity.model.ApplicationControlGlobalRules;
 import com.trendmicro.deepsecurity.model.ApplicationControlPolicyExtension;
 import com.trendmicro.deepsecurity.model.Computer;
+import com.trendmicro.deepsecurity.model.Expand;
 import com.trendmicro.deepsecurity.model.Policy;
 import com.trendmicro.deepsecurity.model.Ruleset;
 import com.trendmicro.deepsecurity.model.SearchCriteria;
@@ -186,6 +187,7 @@ public class ApplicationControlExamples {
 
 		// Update the computer
 		ComputersApi computersApi = new ComputersApi();
-		return computersApi.modifyComputer(computerId, computer, Boolean.FALSE, apiVersion);
+		Expand expand = new Expand();
+		return computersApi.modifyComputer(computerId, computer, expand.list(), Boolean.FALSE, apiVersion);
 	}
 }

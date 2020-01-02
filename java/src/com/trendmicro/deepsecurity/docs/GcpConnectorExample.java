@@ -53,7 +53,7 @@ public class GcpConnectorExample {
 		GcpConnectorActionsApi apiInstance = new GcpConnectorActionsApi();
 		//Set up the synchronize action.
 		Action gcpConnectorAction = new Action();
-		gcpConnectorAction.setType("synchronize");
+		gcpConnectorAction.setType(Action.TypeEnum.SYNCHRONIZE);
 		Action result = apiInstance.createGCPConnectorAction(gcpConnectorID, gcpConnectorAction, apiVersion);
 		return result;
 	}
