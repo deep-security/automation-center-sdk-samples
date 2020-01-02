@@ -38,19 +38,14 @@ def search_roles_by_name(api, configuration, api_version, api_exception, role_na
     role_filter.search_criteria = [name_criteria]
 
     # Perform the search and obtain the ID of the returned role
-    try:
-        # Perform the search
-        admin_roles_api = api.AdministratorRolesApi(api.ApiClient(configuration))
-        roles = admin_roles_api.search_administrator_roles(api_version, search_filter=role_filter)
+    # Perform the search
+    admin_roles_api = api.AdministratorRolesApi(api.ApiClient(configuration))
+    roles = admin_roles_api.search_administrator_roles(api_version, search_filter=role_filter)
 
-        if len(roles.roles) > 0:
-            role_id = roles.roles[0].id
+    if len(roles.roles) > 0:
+        role_id = roles.roles[0].id
 
-            return "The role ID for the " + str(role_name) + " role is " + str(role_id) + "."
-
-    except api_exception as e:
-        return "Exception: " + str(e)
-
+    return role_id
 
 
 def create_role_for_computer_reports(api, configuration, api_version, api_exception):
@@ -84,12 +79,8 @@ def create_role_for_computer_reports(api, configuration, api_version, api_except
     run_reports_role.rights = rights
 
     # Create the role on Deep Security Manager
-    try:
-        # Perform the search
-        admin_roles_api = api.AdministratorRolesApi(api.ApiClient(configuration))
-        new_role = admin_roles_api.create_administrator_role(run_reports_role, api_version)
+    # Perform the search
+    admin_roles_api = api.AdministratorRolesApi(api.ApiClient(configuration))
+    new_role = admin_roles_api.create_administrator_role(run_reports_role, api_version)
 
-        return "The role ID for the " + str(run_reports_role.name) + " role is " + str(new_role.id) + "."
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return new_role.id
