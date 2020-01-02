@@ -465,18 +465,6 @@ ComputerStatusExamples.getRecommendedIPRules(api, computerID, apiVersion)
   });
 */
 /*
-// ### Container Control Examples ###
-const ContainerControlExample = require("./lib/ContainerControlExample.js");
-
-ContainerControlExample.configureContainerControl(api, policyID, apiVersion)
-  .then(modifiedPolicyID => {
-    console.log(`Policy ${modifiedPolicyID} has Container Control state ${modifiedPolicy.containerControl.state}`);
-  })
-  .catch(error => {
-    console.log(`Error setting Container Control state: ${error}`);
-  });
-*/
-/*
 // ### Computer Status Examples ###
 
 ComputerStatusExamples.getComputerStatuses(api, apiVersion)

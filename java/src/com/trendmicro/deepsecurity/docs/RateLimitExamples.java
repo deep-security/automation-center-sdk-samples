@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import com.trendmicro.deepsecurity.ApiException;
 import com.trendmicro.deepsecurity.api.ComputersApi;
 import com.trendmicro.deepsecurity.model.Computer;
+import com.trendmicro.deepsecurity.model.Expand;
 
 public class RateLimitExamples {
 
@@ -48,8 +49,8 @@ public class RateLimitExamples {
 
 				// Index of computer in ComputerIDs to modify in this iteration
 				int i = modifiedComputerIDs.size();
-
-				Computer responseComputer = computersApi.modifyComputer(computerIDs.get(i), requestComputer, Boolean.FALSE, apiVersion);
+				Expand expand = new Expand();
+				Computer responseComputer = computersApi.modifyComputer(computerIDs.get(i), requestComputer, expand.list(), Boolean.FALSE, apiVersion);
 				modifiedComputerIDs.add(responseComputer.getID());
 				retries = 0;
 			} catch (ApiException e) {

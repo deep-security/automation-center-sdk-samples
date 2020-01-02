@@ -23,6 +23,7 @@ import com.trendmicro.deepsecurity.api.SystemSettingsApi;
 import com.trendmicro.deepsecurity.model.AgentDeploymentScript;
 import com.trendmicro.deepsecurity.model.AgentDeploymentScript.PlatformEnum;
 import com.trendmicro.deepsecurity.model.Computer;
+import com.trendmicro.deepsecurity.model.Expand;
 import com.trendmicro.deepsecurity.model.SettingValue;
 import com.trendmicro.deepsecurity.model.SystemSettings;
 
@@ -96,7 +97,8 @@ public class AutomateDeploymentExamples {
 
 		// Add the computer to Deep Security Manager
 		ComputersApi computersApi = new ComputersApi();
-		computer = computersApi.createComputer(computer, Boolean.FALSE, apiVersion);
+		Expand expand = new Expand();
+		computer = computersApi.createComputer(computer, expand.list(), Boolean.FALSE, apiVersion);
 
 		return computer.getID();
 	}

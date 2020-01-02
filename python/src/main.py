@@ -26,7 +26,6 @@ import application_control_examples
 import automate_deployment_examples
 import common_objects_examples
 import computer_status_examples
-import container_control_examples
 import firewall_examples
 import first_steps_get_examples
 import first_steps_post_examples
@@ -68,7 +67,6 @@ api_version = 'v1'
 
 # policy_id for Rate Limit example
 # policy_id for Application Control example
-# policy_id for Container Control example
 # policy_id for Integrity Monitoring example
 # policy_id for Intrusion Prevention examples
 # policy_id for Log Inspection Examples
@@ -380,15 +378,6 @@ def main():
         "Displaying results from anti_malware_examples.modify_anti_malware_policy:\n" +
         str(anti_malware_examples.modify_anti_malware_policy(
             api, configuration, api_version, api_exception, policy_id, real_time_scan_config_id, real_time_scan_schedule_id))
-    )
-    """
-
-    # Container Control example
-    """
-    print(
-        "Displaying results from container_control_examples.configure_container_control:\n" +
-        str(container_control_examples.configure_container_control(
-            api, configuration, api_version, api_exception, policy_id))
     )
     """
 

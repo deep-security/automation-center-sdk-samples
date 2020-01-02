@@ -18,6 +18,7 @@ package com.trendmicro.deepsecurity.docs;
 
 import com.trendmicro.deepsecurity.ApiException;
 import com.trendmicro.deepsecurity.model.Computer;
+import com.trendmicro.deepsecurity.model.Expand;
 import com.trendmicro.deepsecurity.model.LogInspectionRule;
 import com.trendmicro.deepsecurity.model.Policies;
 import com.trendmicro.deepsecurity.model.Policy;
@@ -107,7 +108,8 @@ public class PolicyExamples {
 
 		// Update on Deep Security Manager
 		ComputersApi computersApi = new ComputersApi();
-		return computersApi.modifyComputer(computerID, computer, Boolean.FALSE, apiVersion);
+		Expand expand = new Expand();
+		return computersApi.modifyComputer(computerID, computer, expand.list(), Boolean.FALSE, apiVersion);
 	}
 
 	/**
