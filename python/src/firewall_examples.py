@@ -47,9 +47,5 @@ def modify_firewall_policy(api, configuration, api_version, api_exception, rule_
     # Add reconnaissance scan state to the policy
     policy.policy_settings = policy_settings
 
-    try:
-        # Modify the policy on Deep Security Manager
-        return policies_api.modify_policy(policy_id, policy, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Modify the policy on Deep Security Manager
+    return policies_api.modify_policy(policy_id, policy, api_version)

@@ -65,4 +65,4 @@ def set_computer_policy_check_rate_limit(api, configuration, api_version, api_ex
                 time.sleep(exp_backoff)
             else:
                 # Return all other exception causes or when max retries is exceeded
-                return "Exception: " + str(e)
+                return e

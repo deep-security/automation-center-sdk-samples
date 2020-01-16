@@ -47,14 +47,9 @@ def create_log_inspection_rule(api, configuration, api_version, api_exception, n
     li_rule.rule_description = "Rule for " + path + " and pattern " + pattern
     li_rule.groups = [group]
 
-    try:
-        # Add the rule to Deep Security Manager
-        log_inspection_rules_api = api.LogInspectionRulesApi(api.ApiClient(configuration))
-        return log_inspection_rules_api.create_log_inspection_rule(li_rule, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
-
+    # Add the rule to Deep Security Manager
+    log_inspection_rules_api = api.LogInspectionRulesApi(api.ApiClient(configuration))
+    return log_inspection_rules_api.create_log_inspection_rule(li_rule, api_version)
 
 
 def create_log_inspection_rule_xml(api, configuration, api_version, api_exception, name, xml):
@@ -73,7 +68,7 @@ def create_log_inspection_rule_xml(api, configuration, api_version, api_exceptio
     # Create the rule object
     li_rule = api.LogInspectionRule()
     li_rule.name = name
-    li_rule.description = "A log inspection rule"
+    li_rule.description = "A custom log inspection rule"
 
     # Create a log file and add it to the rule
     log_file = api.LogFile()
@@ -84,16 +79,12 @@ def create_log_inspection_rule_xml(api, configuration, api_version, api_exceptio
     li_rule.log_files = log_files
 
     # Define the rule
-    li_rule.template ="custom"
-    li_rule.XML = xml
+    li_rule.template = "custom"
+    li_rule.rule_xml = xml
 
-    try:
-        # Add the rule to Deep Security Manager
-        log_inspection_rules_api = api.LogInspectionRulesApi(api.ApiClient(configuration))
-        return log_inspection_rules_api.create_log_inspection_rule(li_rule, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Add the rule to Deep Security Manager
+    log_inspection_rules_api = api.LogInspectionRulesApi(api.ApiClient(configuration))
+    return log_inspection_rules_api.create_log_inspection_rule(li_rule, api_version)
 
 
 def add_item_to_directory_list(api, configuration, api_version, api_exception, dir_list_name, dir_path):
@@ -111,25 +102,22 @@ def add_item_to_directory_list(api, configuration, api_version, api_exception, d
     dir_list = api.DirectoryList()
     dir_lists_api = api.DirectoryListsApi(api.ApiClient(configuration))
 
-    try:
-        dir_lists = dir_lists_api.list_directory_lists(api_version)
+    dir_lists = dir_lists_api.list_directory_lists(api_version)
 
-        for dir in dir_lists.directory_lists:
-            if dir.name == dir_list_name:
-                dir_list.dir_list = dir
+    for dir in dir_lists.directory_lists:
+        if dir.name == dir_list_name:
+            dir_list.dir_list = dir
 
-        # Create the directory list if dir_list_name was not found
-        if dir_list.name == None:
-            dir_list.name = dir_list_name
-            dir_list = dir_lists_api.create_directory_list(dir_list, api_version)
+    # Create the directory list if dir_list_name was not found
+    if dir_list.name == None:
+        dir_list.name = dir_list_name
+        dir_list = dir_lists_api.create_directory_list(dir_list, api_version)
 
-        dir_list_with_directory = api.DirectoryList()
-        dir_list_with_directory.items = dir_path
+    dir_list_with_directory = api.DirectoryList()
+    dir_list_with_directory.items = dir_path
 
-        return dir_lists_api.modify_directory_list(dir_list.id, dir_list_with_directory, api_version)
+    return dir_lists_api.modify_directory_list(dir_list.id, dir_list_with_directory, api_version)
 
-    except api_exception as e:
-        return "Exception: " + str(e)
 
 def set_exclusion_dir_real_time_scan(api, configuration, api_version, api_exception, scan_config_id, dir_list_id):
     """ Configures a Malware Scan Configuration to exclude a directory list from scans.
@@ -149,13 +137,9 @@ def set_exclusion_dir_real_time_scan(api, configuration, api_version, api_except
     # Set the exclusion
     real_time_config.excluded_directory_list_id = dir_list_id
 
-    try:
-        # Modify the anti-malware scan configuration on Deep Security Manager
-        am_configurations_api = api.AntiMalwareConfigurationsApi(api.ApiClient(configuration))
-        return am_configurations_api.modify_anti_malware(scan_config_id, real_time_config, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Modify the anti-malware scan configuration on Deep Security Manager
+    am_configurations_api = api.AntiMalwareConfigurationsApi(api.ApiClient(configuration))
+    return am_configurations_api.modify_anti_malware(scan_config_id, real_time_config, api_version)
 
 
 def create_business_hours_schedule(api, configuration, api_version, api_exception):
@@ -186,10 +170,6 @@ def create_business_hours_schedule(api, configuration, api_version, api_exceptio
     schedule.name = "Normal Business Hours"
     schedule.hours_of_week = hours
 
-    try:
-        # Add the schedule to Deep Security Manager
-        schedules_api = api.SchedulesApi(api.ApiClient(configuration))
-        return schedules_api.create_schedule(schedule, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Add the schedule to Deep Security Manager
+    schedules_api = api.SchedulesApi(api.ApiClient(configuration))
+    return schedules_api.create_schedule(schedule, api_version)

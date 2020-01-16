@@ -41,21 +41,17 @@ def create_policy(api, configuration, api_version, api_exception, policy_name):
     # Create a search filter and pass the search criteria to it
     search_filter = api.SearchFilter(None, [search_criteria])
 
-    try:
-        # Search for the Base Policy
-        policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        policy_search_results = policies_api.search_policies(api_version, search_filter=search_filter)
+    # Search for the Base Policy
+    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+    policy_search_results = policies_api.search_policies(api_version, search_filter=search_filter)
 
-        # Set the parent ID of the new policy to the ID of the Base Policy
-        new_policy.parent_id = policy_search_results.policies[0].id
+    # Set the parent ID of the new policy to the ID of the Base Policy
+    new_policy.parent_id = policy_search_results.policies[0].id
 
-        # Add the new policy to Deep Security Manager
-        created_policy = policies_api.create_policy(new_policy, api_version)
+    # Add the new policy to Deep Security Manager
+    created_policy = policies_api.create_policy(new_policy, api_version)
 
-        return created_policy
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return created_policy
 
 
 
@@ -82,42 +78,34 @@ def assign_linux_server_policy(api, configuration, api_version, api_exception, c
     computers_api = api.ComputersApi(api.ApiClient(configuration))
     computer = api.Computer()
 
-    try:
-        # Perform the search
-        policy_search_results = policies_api.search_policies(api_version, search_filter=search_filter)
+    # Perform the search
+    policy_search_results = policies_api.search_policies(api_version, search_filter=search_filter)
 
-        # Assign the policy to the computer
-        computer.policy_id = policy_search_results.policies[0].id
+    # Assign the policy to the computer
+    computer.policy_id = policy_search_results.policies[0].id
 
-        return computers_api.modify_computer(computer_id, computer, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return computers_api.modify_computer(computer_id, computer, api_version)
 
 
 
 def selective_reset_for_log_inspection_rule_on_policy(api, configuration, api_version, api_exception, policy_id, rule_id):
 
-    try:
-        policy_log_inspection_rule_details_api = api.PolicyLogInspectionRuleDetailsApi(api.ApiClient(configuration))
+    policy_log_inspection_rule_details_api = api.PolicyLogInspectionRuleDetailsApi(api.ApiClient(configuration))
 
-        # Get the rule overrides
-        rule_overrides = policy_log_inspection_rule_details_api.describe_log_inspection_rule_on_policy(policy_id, rule_id, api_version, overrides=True)
+    # Get the rule overrides
+    rule_overrides = policy_log_inspection_rule_details_api.describe_log_inspection_rule_on_policy(policy_id, rule_id, api_version, overrides=True)
 
-        # Reset the rule
-        policy_log_inspection_rule_details_api.reset_log_inspection_rule_on_policy(policy_id, rule_id, api_version, overrides=False)
+    # Reset the rule
+    policy_log_inspection_rule_details_api.reset_log_inspection_rule_on_policy(policy_id, rule_id, api_version, overrides=False)
 
-        # Add the desired overrides to a new rule
-        li_rule_overrides_restored = api.LogInspectionRule()
+    # Add the desired overrides to a new rule
+    li_rule_overrides_restored = api.LogInspectionRule()
 
-        if rule_overrides.alert_minimum_severity:
-            li_rule_overrides_restored.alert_minimum_severity = rule_overrides.alert_minimum_severity
+    if rule_overrides.alert_minimum_severity:
+        li_rule_overrides_restored.alert_minimum_severity = rule_overrides.alert_minimum_severity
 
-        if rule_overrides.recommendations_mode:
-            li_rule_overrides_restored.recommendations_mode = rule_overrides.recommendations_mode
+    if rule_overrides.recommendations_mode:
+        li_rule_overrides_restored.recommendations_mode = rule_overrides.recommendations_mode
 
-        # Modify the rule on Deep Security Manager
-        return policy_log_inspection_rule_details_api.modify_log_inspection_rule_on_policy(policy_id, rule_id, li_rule_overrides_restored, api_version, overrides=False)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Modify the rule on Deep Security Manager
+    return policy_log_inspection_rule_details_api.modify_log_inspection_rule_on_policy(policy_id, rule_id, li_rule_overrides_restored, api_version, overrides=False)

@@ -46,13 +46,10 @@ def modify_intrusion_prevention_policy(api, configuration, api_version, api_exce
     # Add the setting to a policy
     policy.policy_settings = policy_settings
 
-    try:
-        # Modify the policy on Deep Security Manager
-        policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        modified_policy = policies_api.modify_policy(policy_id, policy, api_version)
-        return modified_policy.id
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Modify the policy on Deep Security Manager
+    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+    modified_policy = policies_api.modify_policy(policy_id, policy, api_version)
+    return modified_policy.id
 
 
 def get_assigned_intrusion_prevention_rules(api, configuration, api_version, api_exception):
@@ -68,16 +65,12 @@ def get_assigned_intrusion_prevention_rules(api, configuration, api_version, api
     # Include Intrusion Prevention information in the returned Computer objects
     expand = api.Expand(api.Expand.intrusion_prevention)
 
-    try:
-        # Retrieve computers from Deep Security Manager
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
+    # Retrieve computers from Deep Security Manager
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
+    computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
-        # Extract intrusion prevention rules from the computers
-        im_rules = {}
-        for computer in computers_list.computers:
-            im_rules[computer.host_name] = computer.intrusion_prevention.rule_ids
-        return im_rules
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Extract intrusion prevention rules from the computers
+    im_rules = {}
+    for computer in computers_list.computers:
+        im_rules[computer.host_name] = computer.intrusion_prevention.rule_ids
+    return im_rules
