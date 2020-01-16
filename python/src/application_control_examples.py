@@ -15,6 +15,7 @@
 
 import time
 
+
 def configure_application_control(api, configuration, api_version, api_exception, policy_id):
     """ Modifies a policy to set the application control state to on.
 
@@ -37,13 +38,10 @@ def configure_application_control(api, configuration, api_version, api_exception
     update_policy = api.Policy()
     update_policy.application_control = application_control_policy_extension
 
-    try:
-        # Modify the policy on Deep Security Manager
-        app_control_policy = policies_api.modify_policy(policy_id, update_policy, api_version, overrides=False)
-        return app_control_policy
+    # Modify the policy on Deep Security Manager
+    app_control_policy = policies_api.modify_policy(policy_id, update_policy, api_version, overrides=False)
+    return app_control_policy
 
-    except api_exception as e:
-        return "Exception: " + str(e)
 
 def add_global_rules(sha256_list, api, configuration, api_version, api_exception):
     """ Adds new Global Rules
@@ -63,14 +61,12 @@ def add_global_rules(sha256_list, api, configuration, api_version, api_exception
         new_rule.sha256 = sha256
         new_rules.append(new_rule)
 
-    try:
-        # Add the rules
-        global_rules_api = api.GlobalRulesApi(api.ApiClient(configuration))
-        rules_list = api.ApplicationControlGlobalRules()
-        rules_list.application_control_global_rules = new_rules
-        return global_rules_api.add_global_rules(rules_list, api_version)
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Add the rules
+    global_rules_api = api.GlobalRulesApi(api.ApiClient(configuration))
+    rules_list = api.ApplicationControlGlobalRules()
+    rules_list.application_control_global_rules = new_rules
+    return global_rules_api.add_global_rules(rules_list, api_version)
+
 
 def block_all_unrecognized_software(computer_id, api, configuration, api_version, api_exception):
     """ Blocks all software changes on a computer.
@@ -93,26 +89,24 @@ def block_all_unrecognized_software(computer_id, api, configuration, api_version
     # Add criteria to search filter
     search_filter = api.SearchFilter(None, [search_criteria])
 
-    try:
-        # Perform the search
-        software_changes_api = api.SoftwareChangesApi(api.ApiClient(configuration))
-        computer_software_changes = software_changes_api.search_software_changes(api_version, search_filter=search_filter)
+    # Perform the search
+    software_changes_api = api.SoftwareChangesApi(api.ApiClient(configuration))
+    computer_software_changes = software_changes_api.search_software_changes(api_version, search_filter=search_filter)
 
-        # Block the unrecognized software
-        # Create the software change review object and set action to block
-        software_change_review = api.SoftwareChangeReview()
-        software_change_review.action = "block"
-        software_change_review.software_change_ids = []
+    # Block the unrecognized software
+    # Create the software change review object and set action to block
+    software_change_review = api.SoftwareChangeReview()
+    software_change_review.action = "block"
+    software_change_review.software_change_ids = []
 
-        # Add the IDs of the software changes to block
-        for software_change in computer_software_changes.software_changes:
-            software_change_review.software_change_ids.append(software_change.id)
+    # Add the IDs of the software changes to block
+    for software_change in computer_software_changes.software_changes:
+        software_change_review.software_change_ids.append(software_change.id)
 
-        # Perform the software change review
+    # Perform the software change review if software changes happened
+    if len(software_change_review.software_change_ids) > 0:
         return software_changes_api.review_software_changes(software_change_review, api_version)
 
-    except api_exception as e:
-        return "Exception: " + str(e)
 
 def create_shared_ruleset(computer_id, ruleset_name, api, configuration, api_version, api_exception):
     """ Creates a shared ruleset from a computer's software inventory.
@@ -128,24 +122,24 @@ def create_shared_ruleset(computer_id, ruleset_name, api, configuration, api_ver
     software_inventory = api.SoftwareInventory()
     software_inventory.computer_id = computer_id
 
-    try:
-        # Build software_inventory
-        software_inventories_api = api.SoftwareInventoriesApi(api.ApiClient(configuration))
-        new_inventory = software_inventories_api.create_software_inventory(software_inventory, api_version)
+    # Build software_inventory
+    software_inventories_api = api.SoftwareInventoriesApi(
+        api.ApiClient(configuration))
+    new_inventory = software_inventories_api.create_software_inventory(
+        software_inventory, api_version)
 
-        while new_inventory.state != "complete":
-            # check status every 30 seconds
-            time.sleep(30)
-            new_inventory = software_inventories_api.describe_software_inventory(new_inventory.id, api_version)
+    while new_inventory.state != "complete":
+        # check status every 30 seconds
+        time.sleep(30)
+        new_inventory = software_inventories_api.describe_software_inventory(
+            new_inventory.id, api_version)
 
-        # Create ruleset
-        ruleset = api.Ruleset()
-        ruleset.name = ruleset_name
-        rulesets_api = api.RulesetsApi(api.ApiClient(configuration))
-        return rulesets_api.create_ruleset(ruleset, new_inventory.id, api_version)
+    # Create ruleset
+    ruleset = api.Ruleset()
+    ruleset.name = ruleset_name
+    rulesets_api = api.RulesetsApi(api.ApiClient(configuration))
+    return rulesets_api.create_ruleset(ruleset, new_inventory.id, api_version)
 
-    except api_exception as e:
-        return "Exception: " + str(e)
 
 def turn_on_maintenance_mode(computer_id, duration, api, configuration, api_version, api_exception):
     """ Turns on maintenance mode on a computer.
@@ -168,10 +162,6 @@ def turn_on_maintenance_mode(computer_id, duration, api, configuration, api_vers
     computer = api.Computer()
     computer.application_control_computer_extension = application_control
 
-    try:
-        # Update the computer
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        return computers_api.modify_computer(computer_id, computer, api_version)
-        
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Update the computer
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
+    return computers_api.modify_computer(computer_id, computer, api_version)

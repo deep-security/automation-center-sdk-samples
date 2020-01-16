@@ -29,14 +29,10 @@ def override_reconnaissance_scan(api, configuration, api_version, api_exception,
     setting_value = api.SettingValue()
     setting_value.value = "true"
 
-    try:
-        # Apply the override to the computer
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
+    # Apply the override to the computer
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
 
-        return computers_api.modify_computer_setting(computer_id, api.ComputerSettings.firewall_setting_reconnaissance_enabled, setting_value, api_version, overrides=True)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return computers_api.modify_computer_setting(computer_id, api.ComputerSettings.firewall_setting_reconnaissance_enabled, setting_value, api_version, overrides=True)
 
 
 def get_computer_overrides(api, configuration, api_version, api_exception, computer_id, expand):
@@ -51,12 +47,7 @@ def get_computer_overrides(api, configuration, api_version, api_exception, compu
     :return: A Computer object that contains only overrides.
     """
 
-    try:
-        #
-        # Get the Computer object with overrides set to True
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
+    # Get the Computer object with overrides set to True
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
 
-        return computers_api.describe_computer(computer_id, api_version, expand=expand.list(), overrides=True)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return computers_api.describe_computer(computer_id, api_version, expand=expand.list(), overrides=True)
