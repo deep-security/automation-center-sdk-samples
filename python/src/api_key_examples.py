@@ -37,13 +37,9 @@ def create_audit_key(api, configuration, api_version, api_exception, key_name):
     key.time_zone = "Asia/Tokyo"
     key.expiry_date = current_time_in_ms + time_to_expiry_in_ms # expires in 2 weeks
 
-    try:
-        # Create the key on Deep Security Manager
-        api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
-        return api_keys_api.create_api_key(key, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Create the key on Deep Security Manager
+    api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
+    return api_keys_api.create_api_key(key, api_version)
 
 
 def reset_key_secret(api, configuration, api_version, api_exception, key_id):
@@ -57,13 +53,9 @@ def reset_key_secret(api, configuration, api_version, api_exception, key_id):
     :return: An APIKeysApi object that contains the secret of the key.
     """
 
-    try:
-        # Reset the key
-        api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
-        return api_keys_api.replace_api_secret_key(key_id, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Reset the key
+    api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
+    return api_keys_api.replace_api_secret_key(key_id, api_version)
 
 
 def modify_key_role(api, configuration, api_version, api_exception, key_id, role_id):
@@ -82,11 +74,7 @@ def modify_key_role(api, configuration, api_version, api_exception, key_id, role
     key = api.ApiKey()
     key.role_id = role_id
 
-    try:
-        # Modify the key on Deep Security Manager
-        api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
-        api_keys_api.modify_api_key(key_id, key, api_version)
-        return key.role_id
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Modify the key on Deep Security Manager
+    api_keys_api = api.APIKeysApi(api.ApiClient(configuration))
+    api_keys_api.modify_api_key(key_id, key, api_version)
+    return key.role_id
