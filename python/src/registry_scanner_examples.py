@@ -34,11 +34,7 @@ def add_registry_scanner(api, configuration, api_version, api_exception, name, u
     registry_scanner.username = user_account
     registry_scanner.password = user_password
 
-    try:
-        # Add the registry scanner to Deep Security Manager
-        registry_scanner_api = api.RegistryScannersApi(api.ApiClient(configuration))
-        api_response = registry_scanner_api.create_registry_scanner(registry_scanner, api_version)
-        return api_response.id
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Add the registry scanner to Deep Security Manager
+    registry_scanner_api = api.RegistryScannersApi(api.ApiClient(configuration))
+    api_response = registry_scanner_api.create_registry_scanner(registry_scanner, api_version)
+    return api_response.id
