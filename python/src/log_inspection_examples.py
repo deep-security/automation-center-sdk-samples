@@ -36,11 +36,7 @@ def configure_log_inspection(api, configuration, api_version, api_exception, pol
     policy = api.Policy()
     policy.log_inspection = policy_config_log_inspection
 
-    try:
-        # Modify the policy on Deep Security Manager
-        policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        modified_policy = policies_api.modify_policy(policy_id, policy, api_version)
-        return modified_policy.id
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Modify the policy on Deep Security Manager
+    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+    modified_policy = policies_api.modify_policy(policy_id, policy, api_version)
+    return modified_policy.id

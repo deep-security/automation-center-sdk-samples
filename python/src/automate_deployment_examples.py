@@ -40,13 +40,9 @@ def configure_max_sessions(api, configuration, api_version, api_exception, max_a
     exceed_action.value = action
     system_settings.platform_setting_active_sessions_max_exceeded_action = exceed_action
 
-    try:
-        # Modify system settings on Deep Security Manager
-        settings_api = api.SystemSettingsApi(api.ApiClient(configuration))
-        return settings_api.modify_system_settings(system_settings, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Modify system settings on Deep Security Manager
+    settings_api = api.SystemSettingsApi(api.ApiClient(configuration))
+    return settings_api.modify_system_settings(system_settings, api_version)
 
 
 def set_allow_agent_initiated_activation(api, configuration, api_version, api_exception, allow):
@@ -64,13 +60,9 @@ def set_allow_agent_initiated_activation(api, configuration, api_version, api_ex
     allow_value = api.SettingValue()
     allow_value.value = str(allow)
 
-    try:
-        # Modify system setting on Deep Security Manager
-        system_settings_api = api.SystemSettingsApi(api.ApiClient(configuration))
-        return system_settings_api.modify_system_setting(api.SystemSettings.platform_setting_agent_initiated_activation_enabled, allow_value, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Modify system setting on Deep Security Manager
+    system_settings_api = api.SystemSettingsApi(api.ApiClient(configuration))
+    return system_settings_api.modify_system_setting(api.SystemSettings.platform_setting_agent_initiated_activation_enabled, allow_value, api_version)
 
 
 def add_computer (api, configuration, api_version, api_exception, hostname):
@@ -88,14 +80,11 @@ def add_computer (api, configuration, api_version, api_exception, hostname):
     computer = api.Computer()
     computer.host_name = hostname
 
-    try:
-        # Add the computer to Deep Security Manager
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        new_computer = computers_api.create_computer(computer, api_version)
-        return new_computer.id
+    # Add the computer to Deep Security Manager
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
+    new_computer = computers_api.create_computer(computer, api_version)
+    return new_computer.id
 
-    except api_exception as e:
-        return "Exception: " + str(e)
 
 def get_agent_deployment_script (api, configuration, api_version, api_exception, platform, dsm_proxy_id = None, validate_certificate = None, activate = None, computer_group_id = None, policy_id = None, relay_id = None, relay_proxy_id = None):
     """ Obtains an agent deployment script from Deep Security Manager according to the provided parameter values
@@ -126,12 +115,6 @@ def get_agent_deployment_script (api, configuration, api_version, api_exception,
     deployment_script.relay_id = relay_id
     deployment_script.replay_proxy_id = relay_proxy_id
 
-    try:
-        deployment_scripts_api = api.AgentDeploymentScriptsApi(api.ApiClient(configuration))
-        deployment_script = deployment_scripts_api.generate_agent_deployment_script(api_version, agent_deployment_script = deployment_script)
-        return deployment_script.script_body
-
-    except api_exception as e:
-        return "Exception: " + str(e)
-
-
+    deployment_scripts_api = api.AgentDeploymentScriptsApi(api.ApiClient(configuration))
+    deployment_script = deployment_scripts_api.generate_agent_deployment_script(api_version, agent_deployment_script = deployment_script)
+    return deployment_script.script_body

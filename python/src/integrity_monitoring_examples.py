@@ -36,10 +36,6 @@ def configure_integrity_monitoring(api, configuration, api_version, api_exceptio
     policy = api.Policy()
     policy.integrity_monitoring = policy_config_integrity_monitoring
 
-    try:
-        # Modify the policy on Deep Security Manager
-        policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        modified_policy = policies_api.modify_policy(policy_id, policy, api_version)
-        return modified_policy.id
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Modify the policy on Deep Security Manager
+    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+    modified_policy = policies_api.modify_policy(policy_id, policy, api_version)
