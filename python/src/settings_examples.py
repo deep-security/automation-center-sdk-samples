@@ -25,13 +25,9 @@ def get_network_engine_mode(api, configuration, api_version, api_exception, poli
     :return: A string with the firewall_setting_network_engine_mode value.
     """
 
-    try:
-        # Get the policy details from Deep Security Manager
-        policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        return policies_api.describe_policy_setting(policy_id, api.PolicySettings.firewall_setting_network_engine_mode, api_version, overrides=False)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Get the policy details from Deep Security Manager
+    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+    return policies_api.describe_policy_setting(policy_id, api.PolicySettings.firewall_setting_network_engine_mode, api_version, overrides=False)
 
 
 def set_network_engine_mode_to_inline(api, configuration, api_version, api_exception, policy_id):
@@ -49,13 +45,10 @@ def set_network_engine_mode_to_inline(api, configuration, api_version, api_excep
     network_engine_mode_value = api.SettingValue()
     network_engine_mode_value.value = "Inline"
 
-    try:
-        # Modify the setting on Deep Security Manager
-        policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        return policies_api.modify_policy_setting(policy_id, api.PolicySettings.firewall_setting_network_engine_mode, network_engine_mode_value, api_version, overrides=False)
+    # Modify the setting on Deep Security Manager
+    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+    return policies_api.modify_policy_setting(policy_id, api.PolicySettings.firewall_setting_network_engine_mode, network_engine_mode_value, api_version, overrides=False)
 
-    except api_exception as e:
-        return "Exception: " + str(e)
 
 
 def set_firewall_fail_open_behavior(api, configuration, api_version, api_exception, fail_open, policy_id):
@@ -88,11 +81,6 @@ def set_firewall_fail_open_behavior(api, configuration, api_version, api_excepti
     policy = api.Policy()
     policy.policy_settings = policy_settings
 
-    try:
-        # Modify the policy on the Deep Security Manager.
-        policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        return policies_api.modify_policy(policy_id, policy, api_version, overrides=False)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
-
+    # Modify the policy on the Deep Security Manager.
+    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+    return policies_api.modify_policy(policy_id, policy, api_version, overrides=False)

@@ -42,7 +42,6 @@ import scheduled_task_examples
 import role_examples
 import rate_limit_examples
 import gcpconnector_example
-import registry_scanner_examples
 
 # Uncomment to allow connections that are 'secured' with self-signed certificate
 # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -225,15 +224,6 @@ def main():
         "Displaying results from scheduled_task_examples.run_scheduled_task:\n" +
         str(scheduled_task_examples.run_scheduled_task(
             api, configuration, api_version, api_exception, scheduled_task_id))
-    )
-    """
-
-    # Registry Scanner examples
-    """
-    print(
-        "Displaying results from registry_scanner_examples.add_registry_scanner:\n" +
-        str(registry_scanner_examples.add_registry_scanner(
-            api, configuration, api_version, api_exception, "testSmartCheck", "https://79fd1f6d-f634-417c-bf5b-dec0ccc5877d.mock.pstmn.io", "admin", "password"))
     )
     """
 

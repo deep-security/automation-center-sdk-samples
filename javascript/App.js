@@ -187,18 +187,6 @@ ScheduledTaskExamples.createDiscoverComputersScheduledTask(api, apiVersion)
   });
 */
 /*
-// ### Registry Scanner Examples ###
-const RegistryScannerExamples = require("./lib/RegistryScannerExamples.js");
-
-RegistryScannerExamples.createRegistryScanner(api, apiVersion, "testSmartCheck", "https://79fd1f6d-f634-417c-bf5b-dec0ccc5877d.mock.pstmn.io", "admin", "password")
-  .then(rsID => {
-    console.log(`Created Registry Scanner ${rsID}`);
-  })
-  .catch(error => {
-    console.log(`Error creating registry scanner: ${error}`);
-  });
-*/
-/*
 // ### Automated Deployment Examples ###
 const AutomateDeploymentExamples = require("./lib/AutomateDeploymentExamples.js");
 
