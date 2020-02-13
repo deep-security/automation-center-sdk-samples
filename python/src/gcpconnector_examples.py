@@ -33,12 +33,11 @@ def create_gcp_connector(api, configuration, api_version, api_exception, name, s
     # Set the GCP connector properties
     gcp_connector.name = name
     gcp_connector.service_account = service_account
-    try:
-        # Call create_gcp_connector API to create the GCP connector
-        api_response = api_instance.create_gcp_connector(gcp_connector, api_version)
-        return api_response
-    except api_exception as e:
-        print("An exception occurred when calling GCPConnectorsApi.create_google_connector: %s\n" % e)
+
+    # Call create_gcp_connector API to create the GCP connector
+    api_response = api_instance.create_gcp_connector(gcp_connector, api_version)
+    return api_response
+
 
 def submit_gcp_connector_sync_action(api, configuration, api_version, api_exception, gcp_connector_id):
     """ Submits a synchronize action of a GCP connector.
@@ -54,9 +53,7 @@ def submit_gcp_connector_sync_action(api, configuration, api_version, api_except
     api_instance = api.GCPConnectorActionsApi(api.ApiClient(configuration))
     gcp_connector_action = api.Action()
     gcp_connector_action.type = "synchronize"
-    try:
-        # Call the create_gcp_connector_action API to create a synchronize action for the target GCP connector
-        api_response = api_instance.create_gcp_connector_action(gcp_connector_id, gcp_connector_action, api_version)
-        return api_response
-    except api_exception as e:
-        print("An exception occurred when calling GCPConnectorActionsApi.create_google_connector_action: %s\n" % e)
+
+    # Call the create_gcp_connector_action API to create a synchronize action for the target GCP connector
+    api_response = api_instance.create_gcp_connector_action(gcp_connector_id, gcp_connector_action, api_version)
+    return api_response

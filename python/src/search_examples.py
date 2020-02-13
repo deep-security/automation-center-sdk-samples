@@ -38,12 +38,8 @@ def search_policies_by_name(api, configuration, api_version, api_exception, name
     search_filter.max_items = 1
 
     # Perform the search
-    try:
-        policies_api = api.PoliciesApi(api.ApiClient(configuration))
-        return policies_api.search_policies(api_version, search_filter=search_filter)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    policies_api = api.PoliciesApi(api.ApiClient(configuration))
+    return policies_api.search_policies(api_version, search_filter=search_filter)
 
 
 def search_updated_intrusion_prevention_rules(api, configuration, api_version, api_exception, num_days):
@@ -73,12 +69,9 @@ def search_updated_intrusion_prevention_rules(api, configuration, api_version, a
     search_filter = api.SearchFilter(None, [search_criteria])
 
     # Perform the search
-    try:
-        intrusion_prevention_rules_api = api.IntrusionPreventionRulesApi(api.ApiClient(configuration))
-        return intrusion_prevention_rules_api.search_intrusion_prevention_rules(api_version, search_filter=search_filter)
+    intrusion_prevention_rules_api = api.IntrusionPreventionRulesApi(api.ApiClient(configuration))
+    return intrusion_prevention_rules_api.search_intrusion_prevention_rules(api_version, search_filter=search_filter)
 
-    except api_exception as e:
-        return "Exception: " + str(e)
 
 
 def paged_search_computers(api, configuration, api_version, api_exception):
@@ -109,30 +102,26 @@ def paged_search_computers(api, configuration, api_version, api_exception):
     computers_api = api.ComputersApi(api.ApiClient(configuration))
     paged_computers = []
 
-    try:
-        while True:
-            computers = computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
-            num_found = len(computers.computers)
-            current_paged_computers = []
+    while True:
+        computers = computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
+        num_found = len(computers.computers)
+        current_paged_computers = []
 
-            if num_found == 0:
-                print("No computers found.")
-                break
+        if num_found == 0:
+            print("No computers found.")
+            break
 
-            for computer in computers.computers:
-                current_paged_computers.append(computer)
+        for computer in computers.computers:
+            current_paged_computers.append(computer)
 
-            paged_computers.append(current_paged_computers)
+        paged_computers.append(current_paged_computers)
 
-            # Get the ID of the last computer in the page and return it with the number of computers on the page
-            last_id = computers.computers[-1].id
-            search_criteria.id_value = last_id
-            print("Last ID: " + str(last_id), "Computers found: " + str(num_found))
+        # Get the ID of the last computer in the page and return it with the number of computers on the page
+        last_id = computers.computers[-1].id
+        search_criteria.id_value = last_id
+        print("Last ID: " + str(last_id), "Computers found: " + str(num_found))
 
-        return paged_computers
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return paged_computers
 
 
 def get_computers_with_policy_and_relay_list(api, configuration, api_version, api_exception, relay_list_id, policy_id):
@@ -165,13 +154,9 @@ def get_computers_with_policy_and_relay_list(api, configuration, api_version, ap
     # Include the minimum information in the returned Computer objects
     expand = api.Expand(api.Expand.none)
 
-    try:
-        # Perform the search
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        return computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Perform the search
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
+    return computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
 
 
 def search_computers_by_aws_account(api, configuration, api_version, api_exception, account_id):
@@ -198,13 +183,9 @@ def search_computers_by_aws_account(api, configuration, api_version, api_excepti
     # Include only the EC2 virtual machine summary in the returned computers
     expand = api.Expand(api.Expand.ec2_virtual_machine_summary)
 
-    try:
-        # Perform the search
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        return computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Perform the search
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
+    return computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
 
 
 def search_computers_not_updated(api, configuration, api_version, api_exception):
@@ -230,10 +211,7 @@ def search_computers_not_updated(api, configuration, api_version, api_exception)
     # Include minimal information in the returned computers
     expand = api.Expand(api.Expand.none)
 
-    try:
-        # Perform the search
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        return computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
+    # Perform the search
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
+    return computers_api.search_computers(api_version, search_filter=search_filter, expand=expand.list(), overrides=False)
 
-    except api_exception as e:
-        return "Exception: " + str(e)

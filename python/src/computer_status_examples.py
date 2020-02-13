@@ -35,13 +35,11 @@ def check_anti_malware(api, configuration, api_version, api_exception, computer_
     # Get the Anti-Malware scan configuration id for the computer
     real_time_scan_configuration_id = computer.anti_malware.real_time_scan_configuration_id
 
-    try:
-        # Get the Anti-Malware properties for the computer
-        am_configs_api = api.AntiMalwareConfigurationsApi(api.ApiClient(configuration))
+    # Get the Anti-Malware properties for the computer
+    am_configs_api = api.AntiMalwareConfigurationsApi(api.ApiClient(configuration))
+    if real_time_scan_configuration_id != 0:
+        # If the anti-malware module is 'inactive' in the computer, the id will be 0
         return am_configs_api.describe_anti_malware(real_time_scan_configuration_id, api_version)
-
-    except api_exception as e:
-        return "Exception: " + str(e)
 
 
 def find_rules_for_cve(api, configuration, api_version, api_exception, cve_id):
@@ -67,19 +65,15 @@ def find_rules_for_cve(api, configuration, api_version, api_exception, cve_id):
     search_filter = api.SearchFilter()
     search_filter.search_criteria = [search_criteria]
 
-    try:
-        # Search for all intrusion prevention rules for the CVE
-        ip_rules_api = api.IntrusionPreventionRulesApi(api.ApiClient(configuration))
-        ip_rules_search_results = ip_rules_api.search_intrusion_prevention_rules(api_version, search_filter=search_filter)
+    # Search for all intrusion prevention rules for the CVE
+    ip_rules_api = api.IntrusionPreventionRulesApi(api.ApiClient(configuration))
+    ip_rules_search_results = ip_rules_api.search_intrusion_prevention_rules(api_version, search_filter=search_filter)
 
-        # Get the intrusion prevention rule IDs for the CVE from the results
-        for rule in ip_rules_search_results.intrusion_prevention_rules:
-            rule_id_s.append(rule.id)
+    # Get the intrusion prevention rule IDs for the CVE from the results
+    for rule in ip_rules_search_results.intrusion_prevention_rules:
+        rule_id_s.append(rule.id)
 
-        return rule_id_s
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return rule_id_s
 
 
 def check_computers_for_ip_rule(api, configuration, api_version, api_exception, rule_id):
@@ -98,21 +92,17 @@ def check_computers_for_ip_rule(api, configuration, api_version, api_exception, 
     # Include Intrusion Prevention information in the returned Computer objects
     expand = api.Expand(api.Expand.intrusion_prevention)
 
-    try:
-        # Create a list of computers
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
+    # Create a list of computers
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
+    computers_list = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
-        # Search the list of computers for those that do not have the IP rule
-        for computer in computers_list.computers:
-            computer_ip_list = computer.intrusion_prevention
-            if computer_ip_list.rule_ids:
-                if rule_id in computer_ip_list.rule_ids:
-                    unprotected_computers.append(computer)
-        return unprotected_computers
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    # Search the list of computers for those that do not have the IP rule
+    for computer in computers_list.computers:
+        computer_ip_list = computer.intrusion_prevention
+        if computer_ip_list.rule_ids:
+            if rule_id in computer_ip_list.rule_ids:
+                unprotected_computers.append(computer)
+    return unprotected_computers
 
 
 def apply_rule_to_policies(api, configuration, api_version, api_exception, computers, rule_id):
@@ -162,7 +152,7 @@ def apply_rule_to_policies(api, configuration, api_version, api_exception, compu
             modified_policies.append(policies_api.modify_policy(policy_id, policy, api_version))
 
         except api_exception as e:
-            return "Exception: " + str(e)
+            return e
 
     return modified_policies
 
@@ -182,12 +172,9 @@ def get_intrusion_prevention_recommendations(api, configuration, api_version, ap
     ip_recommendations_api = api.ComputerIntrusionPreventionRuleAssignmentsRecommendationsApi(api.ApiClient(configuration))
     ip_assignments = None
 
-    try:
-        ip_assignments = ip_recommendations_api.list_intrusion_prevention_rule_ids_on_computer(computer_id, api_version, overrides=False)
-        return ip_assignments.recommended_to_assign_rule_ids
+    ip_assignments = ip_recommendations_api.list_intrusion_prevention_rule_ids_on_computer(computer_id, api_version, overrides=False)
+    return ip_assignments.recommended_to_assign_rule_ids
 
-    except api_exception as e:
-        return "Exception: " + str(e)
 
 
 def get_computer_statuses(api, configuration, api_version, api_exception):
@@ -206,89 +193,85 @@ def get_computer_statuses(api, configuration, api_version, api_exception):
     # Include computer status information in the returned Computer objects
     expand = api.Expand(api.Expand.computer_status)
 
-    try:
-        # Get all computers
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
+    # Get all computers
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
+    computers = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
-        for computer in computers.computers:
-            computer_info = []
+    for computer in computers.computers:
+        computer_info = []
 
-            # Report on computers with no agent or appliance
-            if computer.agent_finger_print is None and computer.appliance_finger_print is None:
+        # Report on computers with no agent or appliance
+        if computer.agent_finger_print is None and computer.appliance_finger_print is None:
+            # Hostname and protection type
+            computer_info.append(computer.host_name)
+            computer_info.append("None")
+
+            # Agent/appliance status and status messages
+            computer_info.append("No agent/appliance")
+            status_messages = ""
+            if computer.computer_status is not None and computer.computer_status.agent_status is not None:
+                status_messages = str(computer.computer_status.agent_status_messages)
+            computer_info.append(status_messages)
+
+            # Add the computer info to the CSV string
+            csv += format_for_csv(computer_info)
+
+        else:
+            # Report on problem agents and appliances
+            agent_status = computer.computer_status.agent_status
+            appliance_status = computer.computer_status.appliance_status
+
+            # Agent is installed but is not active
+            if computer.agent_finger_print is not None and agent_status != "active":
                 # Hostname and protection type
                 computer_info.append(computer.host_name)
-                computer_info.append("None")
+                computer_info.append("Agent")
 
-                # Agent/appliance status and status messages
-                computer_info.append("No agent/appliance")
-                status_messages = ""
-                if computer.computer_status is not None and computer.computer_status.agent_status is not None:
-                    status_messages = str(computer.computer_status.agent_status_messages)
-                computer_info.append(status_messages)
+                # Agent status, status messages, and tasks
+                if computer.computer_status.agent_status is not None:
+                    computer_info.append(computer.computer_status.agent_status)
+                else:
+                    computer_info.append("")
+
+                if computer.computer_status.agent_status_messages is not None:
+                    computer_info.append(str(computer.computer_status.agent_status_messages))
+                else:
+                    computer_info.append("")
+
+                if computer.tasks is not None:
+                    computer_info.append(str(computer.tasks.agent_tasks))
+                else:
+                    computer_info.append("")
 
                 # Add the computer info to the CSV string
                 csv += format_for_csv(computer_info)
 
-            else:
-                # Report on problem agents and appliances
-                agent_status = computer.computer_status.agent_status
-                appliance_status = computer.computer_status.appliance_status
+            # Appliance is installed but is not active
+            if computer.appliance_finger_print is not None and appliance_status != "active":
+                # Hostname and protection type
+                computer_info.append(computer.host_name)
+                computer_info.append("Appliance")
 
-                # Agent is installed but is not active
-                if computer.agent_finger_print is not None and agent_status != "active":
-                    # Hostname and protection type
-                    computer_info.append(computer.host_name)
-                    computer_info.append("Agent")
+                # Appliance status, status messages, and tasks
+                if computer.computer_status.appliance_status is not None:
+                    computer_info.append(computer.computer_status.appliance_status)
+                else:
+                    computer_info.append("")
 
-                    # Agent status, status messages, and tasks
-                    if computer.computer_status.agent_status is not None:
-                        computer_info.append(computer.computer_status.agent_status)
-                    else:
-                        computer_info.append("")
+                if computer.computer_status.appliance_status_messages is not None:
+                    computer_info.append(str(computer.computer_status.appliance_status_messages))
+                else:
+                    computer_info.append("")
 
-                    if computer.computer_status.agent_status_messages is not None:
-                        computer_info.append(str(computer.computer_status.agent_status_messages))
-                    else:
-                        computer_info.append("")
+                if computer.tasks is not None:
+                    computer_info.append(str(computer.tasks.appliance_tasks))
+                else:
+                    computer_info.append("")
 
-                    if computer.tasks is not None:
-                        computer_info.append(str(computer.tasks.agent_tasks))
-                    else:
-                        computer_info.append("")
+                # Add the computer info to the CSV string
+                csv += format_for_csv(computer_info)
 
-                    # Add the computer info to the CSV string
-                    csv += format_for_csv(computer_info)
-
-                # Appliance is installed but is not active
-                if computer.appliance_finger_print is not None and appliance_status != "active":
-                    # Hostname and protection type
-                    computer_info.append(computer.host_name)
-                    computer_info.append("Appliance")
-
-                    # Appliance status, status messages, and tasks
-                    if computer.computer_status.appliance_status is not None:
-                        computer_info.append(computer.computer_status.appliance_status)
-                    else:
-                        computer_info.append("")
-
-                    if computer.computer_status.appliance_status_messages is not None:
-                        computer_info.append(str(computer.computer_status.appliance_status_messages))
-                    else:
-                        computer_info.append("")
-
-                    if computer.tasks is not None:
-                        computer_info.append(str(computer.tasks.appliance_tasks))
-                    else:
-                        computer_info.append("")
-
-                    # Add the computer info to the CSV string
-                    csv += format_for_csv(computer_info)
-
-        return csv
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return csv
 
 
 def get_anti_malware_status_for_computers(api, configuration, api_version, api_exception):
@@ -310,59 +293,55 @@ def get_anti_malware_status_for_computers(api, configuration, api_version, api_e
     # Include Anti-Malware information in the returned Computer objects
     expand = api.Expand(api.Expand.anti_malware)
 
-    try:
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
+    computers = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
-        # Get the list of computers and iterate over it
-        for computer in computers.computers:
-            # Module information to add to the CSV string
-            module_info = []
+    # Get the list of computers and iterate over it
+    for computer in computers.computers:
+        # Module information to add to the CSV string
+        module_info = []
 
-            # Check that the computer has a an agent or appliance status
-            if computer.anti_malware.module_status:
-                agent_status = computer.anti_malware.module_status.agent_status
-                appliance_status = computer.anti_malware.module_status.appliance_status
-            else:
-                agent_status = None
-                appliance_status = None
+        # Check that the computer has a an agent or appliance status
+        if computer.anti_malware.module_status:
+            agent_status = computer.anti_malware.module_status.agent_status
+            appliance_status = computer.anti_malware.module_status.appliance_status
+        else:
+            agent_status = None
+            appliance_status = None
 
-            # Agents that are not active for the module
-            if agent_status and agent_status != "active":
-                # Host name
-                module_info.append(computer.host_name)
+        # Agents that are not active for the module
+        if agent_status and agent_status != "active":
+            # Host name
+            module_info.append(computer.host_name)
 
-                # Module state
-                module_info.append(computer.anti_malware.state)
+            # Module state
+            module_info.append(computer.anti_malware.state)
 
-                # Agent status and status message
-                module_info.append("Agent")
-                module_info.append(agent_status)
-                module_info.append(computer.anti_malware.module_status.agent_status_message)
+            # Agent status and status message
+            module_info.append("Agent")
+            module_info.append(agent_status)
+            module_info.append(computer.anti_malware.module_status.agent_status_message)
 
-                # Add the module info to the CSV string
-                csv += format_for_csv(module_info)
+            # Add the module info to the CSV string
+            csv += format_for_csv(module_info)
 
-            # Appliances that are not active for the module
-            if appliance_status and appliance_status != "active":
-                # Host name
-                module_info.append(computer.host_name)
-        
-                # Module state
-                module_info.append(computer.anti_malware.state)
-        
-                # Appliance status and status message
-                module_info.append("Appliance")
-                module_info.append(appliance_status)
-                module_info.append(computer.anti_malware.module_status.appliance_status_message)
-        
-                # Add the module info to the CSV string
-                csv += format_for_csv(module_info)
+        # Appliances that are not active for the module
+        if appliance_status and appliance_status != "active":
+            # Host name
+            module_info.append(computer.host_name)
+    
+            # Module state
+            module_info.append(computer.anti_malware.state)
+    
+            # Appliance status and status message
+            module_info.append("Appliance")
+            module_info.append(appliance_status)
+            module_info.append(computer.anti_malware.module_status.appliance_status_message)
+    
+            # Add the module info to the CSV string
+            csv += format_for_csv(module_info)
 
-        return csv
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return csv
 
 
 def get_date_of_last_recommendation_scan(api, configuration, api_version, api_exception):
@@ -386,42 +365,38 @@ def get_date_of_last_recommendation_scan(api, configuration, api_version, api_ex
     # Include minimal information in the returned Computer objects
     expand = api.Expand(api.Expand.none)
 
-    try:
-        # Get the list of computers and iterate over it
-        computers_api = api.ComputersApi(api.ApiClient(configuration))
-        computers = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
+    # Get the list of computers and iterate over it
+    computers_api = api.ComputersApi(api.ApiClient(configuration))
+    computers = computers_api.list_computers(api_version, expand=expand.list(), overrides=False)
 
-        computer_ips_assignments_recommendations_api = (
-            api.ComputerIntrusionPreventionRuleAssignmentsRecommendationsApi(api.ApiClient(configuration)))
-        for computer in computers.computers:
-            # Get the recommendation scan information
-            intrusion_prevention_assignments = (
-                computer_ips_assignments_recommendations_api.list_intrusion_prevention_rule_ids_on_computer(
-                    computer.id,
-                    api_version,
-                    overrides=False))
-            reco_scan_info = list()
+    computer_ips_assignments_recommendations_api = (
+        api.ComputerIntrusionPreventionRuleAssignmentsRecommendationsApi(api.ApiClient(configuration)))
+    for computer in computers.computers:
+        # Get the recommendation scan information
+        intrusion_prevention_assignments = (
+            computer_ips_assignments_recommendations_api.list_intrusion_prevention_rule_ids_on_computer(
+                computer.id,
+                api_version,
+                overrides=False))
+        reco_scan_info = list()
 
-            # Computer name
-            reco_scan_info.append(computer.host_name)
+        # Computer name
+        reco_scan_info.append(computer.host_name)
 
-            # Scan date
-            if intrusion_prevention_assignments.last_recommendation_scan_date is not None:
-                d = datetime.datetime.utcfromtimestamp(intrusion_prevention_assignments.last_recommendation_scan_date/1000)
-                reco_scan_info.append(d.strftime('%Y-%m-%d %H:%M:%S'))
-            else:
-                reco_scan_info.append("No scan on record")
+        # Scan date
+        if intrusion_prevention_assignments.last_recommendation_scan_date is not None:
+            d = datetime.datetime.utcfromtimestamp(intrusion_prevention_assignments.last_recommendation_scan_date/1000)
+            reco_scan_info.append(d.strftime('%Y-%m-%d %H:%M:%S'))
+        else:
+            reco_scan_info.append("No scan on record")
 
-            # Scan status
-            reco_scan_info.append(intrusion_prevention_assignments.recommendation_scan_status)
+        # Scan status
+        reco_scan_info.append(intrusion_prevention_assignments.recommendation_scan_status)
 
-            # Add to the CSV string
-            csv += format_for_csv(reco_scan_info)
+        # Add to the CSV string
+        csv += format_for_csv(reco_scan_info)
 
-        return csv
-
-    except api_exception as e:
-        return "Exception: " + str(e)
+    return csv
 
 
 def format_for_csv(line_item):
