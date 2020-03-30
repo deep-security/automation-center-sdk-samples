@@ -160,7 +160,7 @@ def turn_on_maintenance_mode(computer_id, duration, api, configuration, api_vers
 
     # Add the ApplicationControlComputerExtension to a Computer object
     computer = api.Computer()
-    computer.application_control_computer_extension = application_control
+    computer.application_control = application_control
 
     # Update the computer
     computers_api = api.ComputersApi(api.ApiClient(configuration))
