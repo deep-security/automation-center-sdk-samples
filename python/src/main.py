@@ -42,6 +42,7 @@ import scheduled_task_examples
 import role_examples
 import rate_limit_examples
 import gcpconnector_example
+import xdr_registration_examples
 
 # Uncomment to allow connections that are 'secured' with self-signed certificate
 # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -600,6 +601,16 @@ def main():
     api_instance.delete_gcp_connector(gcpconnector.id, api_version)
     print(
         "Delete GCP Connector\n"
+    )
+    """
+
+    # XDR Registration example
+    """
+    registration_token = "enrollment_token_from_XDR_console"
+    print(
+        "Displaying results from :xdr_registration_example.create_xdr_registration\n" +
+        str(xdr_registration_example.create_xdr_registration(
+            api, configuration, api_version, api_exception, registration_token))
     )
     """
 
