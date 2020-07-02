@@ -28,6 +28,7 @@ local.properties
 # Java annotation processor (APT)
 .factorypath
 
+
 # PDT-specific (PHP Development Tools)
 .buildpath
 
@@ -71,3 +72,5 @@ patches/
 package-lock.json
 example.properties
 .idea
+
+.DS_Store

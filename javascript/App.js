@@ -642,3 +642,15 @@ TenantExample.addPolicyToTenant(api, newPolicy, tenantID, apiVersion)
     console.log(`Error creating policy on tenant: ${error}`);
   });
 */
+/*
+// ### XDR Registration Examples ###
+const XdrRegistrationExamples = require("./lib/XdrRegistrationExamples.js");
+
+XdrRegistrationExamples.createXdrRegistration(api, apiVersion, "testSmartCheck", "enrollment_token_from_XDR_console")
+  .then(ID => {
+    console.log(`Created XDR Registration ${ID}`);
+  })
+  .catch(error => {
+    console.log(`Error creating XDR Registration: ${error}`);
+  });
+*/
