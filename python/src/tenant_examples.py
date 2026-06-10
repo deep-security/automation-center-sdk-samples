@@ -28,7 +28,7 @@ def create_tenant(api, configuration, api_version, api_exception, account_name):
     # Define the administrator account
     admin = api.Administrator()
     admin.username = "TenantAdmin"
-    admin.password = "Pas$w0rd"
+    admin.password = "<tenant-admin-password>"
     admin.email_address = "example@email.com"
     admin.receive_notifications = "false"
     admin.role_id = 1

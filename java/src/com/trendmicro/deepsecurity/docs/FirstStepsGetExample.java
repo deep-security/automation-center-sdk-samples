@@ -34,7 +34,7 @@ public class FirstStepsGetExample {
 		ApiClient dsmClient = Configuration.getDefaultApiClient();
 		dsmClient.setBasePath("https://192.168.60.128:4119/api");
 		ApiKeyAuth defaultAuthentication = (ApiKeyAuth)dsmClient.getAuthentication("DefaultAuthentication");
-		defaultAuthentication.setApiKey("3:/tiKl3+6ritnk4tQXipq5ufIls5nCFqoGoUcWl+imTU=");
+		defaultAuthentication.setApiKey("<your-api-secret-key>");
 
 		// Create a PoliciesApi object
 		PoliciesApi policiesApi = new PoliciesApi();

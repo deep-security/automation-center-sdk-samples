@@ -34,7 +34,7 @@ exports.createTenant = function(api, accountName, apiVersion) {
   // Define the administrator account
   const admin = new api.Administrator();
   admin.username = 'MasterAdmin';
-  admin.password = 'P@55word';
+  admin.password = '<tenant-admin-password>';
   admin.emailAddress = 'example@email.com';
   tenant.administrator = admin;
 

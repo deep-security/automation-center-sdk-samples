@@ -71,7 +71,7 @@ public class TenantExamples {
 		// Administrator account
 		Administrator admin = new Administrator();
 		admin.setUsername("MasterAdmin");
-		admin.setPassword("P@55word");
+		admin.setPassword("<tenant-admin-password>");
 		admin.setEmailAddress("bad@email.com");
 
 		tenant.setName(accountName);

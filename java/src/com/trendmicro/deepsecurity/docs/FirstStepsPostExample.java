@@ -36,7 +36,7 @@ public class FirstStepsPostExample {
 		ApiClient dsmClient = Configuration.getDefaultApiClient();
 		dsmClient.setBasePath("https://192.168.60.128:4119/api");
 		ApiKeyAuth defaultAuthentication = (ApiKeyAuth)dsmClient.getAuthentication("DefaultAuthentication");
-		defaultAuthentication.setApiKey("3:fkZjcAuvj9ZWhdXgVvFl4Q3DymDZTKHOE3EDDqYPwdg=");
+		defaultAuthentication.setApiKey("<your-api-secret-key>");
 
 		// Create the search criteria
 		SearchCriteria searchCriteria = new SearchCriteria();

@@ -56,7 +56,7 @@ if __name__ == '__main__':
     configuration.host = 'https://192.168.17.149:4119/api'
 
     # Authentication
-    configuration.api_key['api-secret-key'] = '2:l069trAePqPRxZUfBqyw442z1DWm9s4u0F/g9bewnFE='
+    configuration.api_key['api-secret-key'] = '<your-api-secret-key>'
 
     # Version
     api_version = 'v1'
